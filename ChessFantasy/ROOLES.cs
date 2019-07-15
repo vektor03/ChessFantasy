@@ -1899,9 +1899,9 @@ namespace ChessFantasy
         }
 
         /// <summary>
-        /// Атакует ли слон
+        /// Атакует ли слон заданную клетку?
         /// </summary>
-        bool CheckBishopAtacks(XY bishopXY, XY cellXY)
+        bool CheckBishopAtacks(XY bishopXY, Board board, XY cellXY)
         {
             //Ответ на вопрос, находится ли заданная клетка под атакой конкретного слона
 
@@ -1913,36 +1913,125 @@ namespace ChessFantasy
                 return false;
             }
 
+            //если слон рядом с клеткой то он чточно может ее атаковать
+            if (Math.Abs(cellXY.r - bishopXY.r) == 1)
+            { return true; }
+
+            int CountMiddleCells = Math.Abs(cellXY.r - bishopXY.r) - 1;//количество пустых клеток между слоном и целью
+
             if ((cellXY.r < bishopXY.r) & (cellXY.c > bishopXY.c))//клетка сверху-справа
             {
-
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[bishopXY.r - i, bishopXY.c + i] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
+                return true;
             }
             else if ((cellXY.r > bishopXY.r) & (cellXY.c > bishopXY.c))//клетка снизу-справа
             {
-
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[bishopXY.r + i, bishopXY.c + i] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
+                return true;
             }
             else if ((cellXY.r > bishopXY.r) & (cellXY.c < bishopXY.c))//клетка снизу-слева
             {
-
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[bishopXY.r + i, bishopXY.c - i] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
+                return true;
             }
             else if ((cellXY.r < bishopXY.r) & (cellXY.c < bishopXY.c))//клетка сверху-слева
             {
-
-            }
-
-
-                if (((cellXY.r == bishopXY.r - 2) & (cellXY.c == bishopXY.c + 1)) |
-                ((cellXY.r == bishopXY.r - 1) & (cellXY.c == bishopXY.c + 2)) |
-                ((cellXY.r == bishopXY.r + 1) & (cellXY.c == bishopXY.c + 2)) |
-                ((cellXY.r == bishopXY.r + 2) & (cellXY.c == bishopXY.c + 1)) |
-                ((cellXY.r == bishopXY.r + 2) & (cellXY.c == bishopXY.c - 1)) |
-                ((cellXY.r == bishopXY.r + 1) & (cellXY.c == bishopXY.c - 2)) |
-                ((cellXY.r == bishopXY.r - 1) & (cellXY.c == bishopXY.c - 2)) |
-                ((cellXY.r == bishopXY.r - 2) & (cellXY.c == bishopXY.c - 1)))
-            {
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[bishopXY.r - i, bishopXY.c - i] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
                 return true;
             }
-            else { return false; }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Атакует ли ладья заданную клетку?
+        /// </summary>
+        bool CheckRookAtacks(XY rookXY, Board board, XY cellXY)
+        {
+            //Ответ на вопрос, находится ли заданная клетка под атакой конкретной ладьи
+
+            //для начала нужно убедиться что ладья и атакованная клетка лежат на одной горизонтали/вертикали
+            if ( (cellXY.r != rookXY.r) & (cellXY.c != rookXY.c) )
+            {
+                return false;
+            }
+
+            //если ладья рядом с клеткой то она точно может ее атаковать
+            int dr = Math.Abs(cellXY.r - rookXY.r);//абсолютная разница по строкам
+            int dc = Math.Abs(cellXY.c - rookXY.c);//абсолютная разница по столбцам
+            if (( dr + dc ) == 1)
+            { return true; }
+
+            int CountMiddleCells = dr + dc - 1;//количество пустых клеток между ладьей и целью
+
+            if ((cellXY.r == rookXY.r) & (cellXY.c > rookXY.c))//клетка сверху-справа
+            {
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[rookXY.r, rookXY.c + i] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
+                return true;
+            }
+            else if ((cellXY.r > rookXY.r) & (cellXY.c == rookXY.c))//клетка снизу-справа
+            {
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[rookXY.r + i, rookXY.c] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
+                return true;
+            }
+            else if ((cellXY.r == rookXY.r) & (cellXY.c < rookXY.c))//клетка снизу-слева
+            {
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[rookXY.r, rookXY.c - i] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
+                return true;
+            }
+            else if ((cellXY.r < rookXY.r) & (cellXY.c == rookXY.c))//клетка сверху-слева
+            {
+                for (int i = 1; i < CountMiddleCells + 1; i++)
+                {
+                    if (board._board[rookXY.r - i, rookXY.c] != Cell.Empty)//Если между ними не пустая клетка
+                    { return false; }
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Атакует ли ферзь заданную клетку?
+        /// </summary>
+        bool CheckQueenAtacks(XY queenXY, Board board, XY cellXY)
+        {
+            //Ферзь ходит как ладья и как слон и можно просто вызвать 
+            //процедуры проверки атаки слона и ладьи, если хоть одна из них атакует, то ферзь тоже
+
+            bool BishopAtacks = CheckBishopAtacks(queenXY, board, cellXY);
+            bool RookAtacks = CheckRookAtacks(queenXY, board, cellXY);
+
+            return BishopAtacks | RookAtacks;
         }
 
         /// <summary>
@@ -1972,7 +2061,8 @@ namespace ChessFantasy
         bool CheckCheck(XY kingXY, Board board, Color kingColor, FiguresXY enemyFigures)
         {
             int FiguresCount = enemyFigures.Array.Length;
-            Move[] Temp = null;
+            bool TempFlag = false;//флаг для проверки что эта фигура атакует короля.
+            //если флаг равен 1, значит королю шах
 
             for (int i = 0; i < FiguresCount; i++)
             {
@@ -1985,19 +2075,28 @@ namespace ChessFantasy
                     switch (board._board[rEnemy, cEnemy])//клетка на которой стоит вражеская фигура
                     {
                         case (Cell.BlackPawn):
-                            Temp = FindPawnAtacks(enemyXY, board, (Color)1);
+                            TempFlag = CheckPawnAtacks(enemyXY, (Color)1, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
                         case (Cell.BlackKnight):
-                            Temp = FindKnightMoves(enemyXY, board, (Color)1);
+                            TempFlag = CheckKnightAtacks(enemyXY, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
                         case (Cell.BlackBishop):
-                            Temp = FindBishopMoves(enemyXY, board, (Color)1);
+                            TempFlag = CheckBishopAtacks(enemyXY, board, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
                         case (Cell.BlackRook):
-                            Temp = FindRookMoves(enemyXY, board, (Color)1);
+                            TempFlag = CheckRookAtacks(enemyXY, board, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
                         case (Cell.BlackQueen):
-                            Temp = FindQueenMoves(enemyXY, board, (Color)1);
+                            TempFlag = CheckQueenAtacks(enemyXY, board, kingXY);
+                            if (TempFlag) { return TempFlag; }
+                            break;
+                        case (Cell.BlackKing):
+                            TempFlag = CheckKingAtacks(enemyXY, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
                         default:
                             break;
@@ -2007,34 +2106,32 @@ namespace ChessFantasy
                 {
                     switch (board._board[rEnemy, cEnemy])//клетка на которой стоит вражеская фигура
                     {
-                        case (Cell.WhitePawn):
-                            Temp = FindPawnAtacks(enemyXY, board, (Color)0);
+                        case (Cell.BlackPawn):
+                            TempFlag = CheckPawnAtacks(enemyXY, (Color)0, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
-                        case (Cell.WhiteKnight):
-                            Temp = FindKnightMoves(enemyXY, board, (Color)0);
+                        case (Cell.BlackKnight):
+                            TempFlag = CheckKnightAtacks(enemyXY, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
-                        case (Cell.WhiteBishop):
-                            Temp = FindBishopMoves(enemyXY, board, (Color)0);
+                        case (Cell.BlackBishop):
+                            TempFlag = CheckBishopAtacks(enemyXY, board, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
-                        case (Cell.WhiteRook):
-                            Temp = FindRookMoves(enemyXY, board, (Color)0);
+                        case (Cell.BlackRook):
+                            TempFlag = CheckRookAtacks(enemyXY, board, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
-                        case (Cell.WhiteQueen):
-                            Temp = FindQueenMoves(enemyXY, board, (Color)0);
+                        case (Cell.BlackQueen):
+                            TempFlag = CheckQueenAtacks(enemyXY, board, kingXY);
+                            if (TempFlag) { return TempFlag; }
+                            break;
+                        case (Cell.BlackKing):
+                            TempFlag = CheckKingAtacks(enemyXY, kingXY);
+                            if (TempFlag) { return TempFlag; }
                             break;
                         default:
                             break;
-                    }
-                }
-
-                if (Temp != null)//если найденный массив ходов фигуры не пустой
-                {
-                    int CountFound = Temp.Length;
-                    //нужно проверить для каждого хода, совпадает ли завершение хода с координатами короля
-                    for (int j = 0; j < CountFound; j++)
-                    {
-                        if ((kingXY.r == Temp[j].XY2.r) & (kingXY.c == Temp[j].XY2.c))
-                        { return true; }
                     }
                 }
 
@@ -2046,13 +2143,16 @@ namespace ChessFantasy
         /// <summary>
         /// Проверка хода на соответствие правилам
         /// </summary>
-        bool CheckMove(XY kingXY, Board board, Color color, FiguresXY enemyFigures, Move move)
+        bool CheckMove(XY kingXY, Board board, Color color, FiguresXY enemyFigures, Move move, Move enemyLastMove)
         {
             int r1 = move.XY1.r;//строка начала хода
             int c1 = move.XY1.c;//столбец начала хода
             int r2 = move.XY2.r;//строка конца хода
             int c2 = move.XY2.c;//столбец конца хода
-            Move[] Temp = null;//все ходы фигуры, которая ходит
+            Move[] PawnFoundMoves = null;//все ходы фигуры, которая ходит
+
+            bool TempFlag = false;//флаг для проверки что эта фигура может атаковать заданную клетку.
+            //если флаг равен 1, значит королю шах
 
             //для начала нужно убедиться что мы пытаемся ходить своей фигурой
             if (color == Color.White)//если мы пытаемся ходить белыми фигурами
@@ -2061,22 +2161,29 @@ namespace ChessFantasy
                 switch (board._board[r1, c1])//клетка с которой начинается ход
                 {
                     case (Cell.WhitePawn):
-                        Temp = FindPawnMoves(move.XY1, board, color);
+                        TempFlag = CheckPawnAtacks(move.XY1, color, move.XY2);
+                        if (TempFlag) { return TempFlag; }
+                        PawnFoundMoves = FindPawnMoves(move.XY1, board, color, enemyLastMove);
                         break;
                     case (Cell.WhiteKnight):
-                        Temp = FindKnightMoves(move.XY1, board, color);
+                        TempFlag = CheckKnightAtacks(move.XY1, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.WhiteBishop):
-                        Temp = FindBishopMoves(move.XY1, board, color);
+                        TempFlag = CheckBishopAtacks(move.XY1, board, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.WhiteRook):
-                        Temp = FindRookMoves(move.XY1, board, color);
+                        TempFlag = CheckRookAtacks(move.XY1, board, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.WhiteQueen):
-                        Temp = FindQueenMoves(move.XY1, board, color);
+                        TempFlag = CheckQueenAtacks(move.XY1, board, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.WhiteKing):
-                        Temp = FindKingMoves(move.XY1, board, color);
+                        TempFlag = CheckKingAtacks(move.XY1, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     default:
                         return false;
@@ -2087,40 +2194,52 @@ namespace ChessFantasy
                 switch (board._board[r1, c1])//клетка с которой начинается ход
                 {
                     case (Cell.BlackPawn):
-                        Temp = FindPawnMoves(move.XY1, board, color);
+                        TempFlag = CheckPawnAtacks(move.XY1, color, move.XY2);
+                        if (TempFlag) { return TempFlag; }
+                        PawnFoundMoves = FindPawnMoves(move.XY1, board, color, enemyLastMove);
                         break;
                     case (Cell.BlackKnight):
-                        Temp = FindKnightMoves(move.XY1, board, color);
+                        TempFlag = CheckKnightAtacks(move.XY1, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.BlackBishop):
-                        Temp = FindBishopMoves(move.XY1, board, color);
+                        TempFlag = CheckBishopAtacks(move.XY1, board, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.BlackRook):
-                        Temp = FindRookMoves(move.XY1, board, color);
+                        TempFlag = CheckRookAtacks(move.XY1, board, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.BlackQueen):
-                        Temp = FindQueenMoves(move.XY1, board, color);
+                        TempFlag = CheckQueenAtacks(move.XY1, board, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     case (Cell.BlackKing):
-                        Temp = FindKingMoves(move.XY1, board, color);
+                        TempFlag = CheckKingAtacks(move.XY1, move.XY2);
+                        if (TempFlag) { return TempFlag; }
                         break;
                     default:
                         return false;
                 }
             }
 
-            //теперь нужно убедиться что у этой фигуры есть доступный ход, совпадающий с заявленным
-            int CountFound = Temp.Length;
-            bool flagMatch = false;//найден доступный ход, совпадающий с заявленным
-            for (int i = 0; i < CountFound; i++)
+            if (PawnFoundMoves != null)//если мы пытаемся ходить пешкой, то нужно еще проверить 
+                //взятие на проходе, для этого просто берутся все возможные ходы этой пешки и сравниваются с предложенным ходом
             {
-                if ((Temp[i].XY2.r == r2) & (Temp[i].XY2.c == c2))
+                //теперь нужно убедиться что у пешки есть доступный ход, совпадающий с заявленным
+                int CountFound = PawnFoundMoves.Length;
+                bool flagMatch = false;//найден доступный ход, совпадающий с заявленным
+                for (int i = 0; i < CountFound; i++)
                 {
-                    flagMatch = true;
-                    break;
+                    if ((PawnFoundMoves[i].XY2.r == r2) & (PawnFoundMoves[i].XY2.c == c2))
+                    {
+                        flagMatch = true;
+                        break;
+                    }
                 }
+                if (flagMatch == false) { return false; }//заданного хода нет среди доступных
             }
-            if (flagMatch == false) { return false; }//заданного хода нет среди доступных
+            
 
             //теперь нужно проверить что после выполнения хода король не окажется под шахом
             Board BoardMove = DoMove(board, move);
