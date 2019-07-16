@@ -2627,7 +2627,7 @@ namespace ChessFantasy
         public int r;//row
         public int c;//column
 
-        public XY(int c, int r)
+        public XY(int r, int c)
         {
             this.r = r;
             this.c = c;
@@ -2653,10 +2653,10 @@ namespace ChessFantasy
             get { return _move[1]; }
         }
 
-        public Move(int x1, int y1, int x2, int y2)//конструктор из координат хода, может не нужен
+        public Move(int r1, int c1, int r2, int c2)//конструктор из координат хода, может не нужен
         {
-            XY xy1 = new XY(x1, y1);
-            XY xy2 = new XY(x2, y2);
+            XY xy1 = new XY(r1, c1);
+            XY xy2 = new XY(r2, c2);
             _move = new XY[2] { xy1, xy2 };
         }
 
@@ -2693,6 +2693,39 @@ namespace ChessFantasy
         public FiguresXY(FiguresXY a)//конструктор копирования
         {
             _figures = a._figures;
+        }
+
+        public FiguresXY(Color color)//конструктор для начальной позиции шахмат
+        {
+            int p = 0;//итератор для выходного массива фигур
+            XY[] OutFigures = new XY[12];
+            XY TempXY = null;
+
+            if (color == Color.White)
+            {
+                for (int j = 7; j > 5; j--)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        TempXY = new XY(j, i);
+                        OutFigures[p] = TempXY;
+                        p++;
+                    }
+                }
+            }
+            else
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        TempXY = new XY(j, i);
+                        OutFigures[p] = TempXY;
+                        p++;
+                    }
+                }
+            }
+            _figures = OutFigures;
         }
     }
 }
