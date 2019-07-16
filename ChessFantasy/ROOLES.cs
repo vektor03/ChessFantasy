@@ -2379,15 +2379,15 @@ namespace ChessFantasy
         /// </summary>
         bool CheckCheck(XY kingXY, Board board, Color kingColor, FiguresXY enemyFigures)
         {
-            int FiguresCount = enemyFigures.Array.Length;
+            int FiguresCount = enemyFigures.Figures.Length;
             bool TempFlag = false;//флаг для проверки что эта фигура атакует короля.
             //если флаг равен 1, значит королю шах
 
             for (int i = 0; i < FiguresCount; i++)
             {
-                int rEnemy = enemyFigures.Array[i].r;
-                int cEnemy = enemyFigures.Array[i].c;
-                XY enemyXY = enemyFigures.Array[i];
+                int rEnemy = enemyFigures.Figures[i].r;
+                int cEnemy = enemyFigures.Figures[i].c;
+                XY enemyXY = enemyFigures.Figures[i];
 
                 if (kingColor == Color.White)//проверяем шах белого короля
                 {
@@ -2464,14 +2464,14 @@ namespace ChessFantasy
         /// </summary>
         bool CheckMate(XY kingXY, Board board, Color kingColor, FiguresXY Figures, FiguresXY enemyFigures, Move enemyLastMove)
         {
-            int FiguresCount = Figures.Array.Length;//Количество наших фигур
+            int FiguresCount = Figures.Figures.Length;//Количество наших фигур
             Move[] FoundMoves = null;//массив доступных ходов нашей фигуры
 
             for (int i = 0; i < FiguresCount; i++)
             {
-                int rFig = Figures.Array[i].r;
-                int cFig = Figures.Array[i].c;
-                XY FigXY = Figures.Array[i];// координаты фигуры, которую мы сейчас проверяем
+                int rFig = Figures.Figures[i].r;
+                int cFig = Figures.Figures[i].c;
+                XY FigXY = Figures.Figures[i];// координаты фигуры, которую мы сейчас проверяем
 
                 if (kingColor == Color.White)//проверяем шах белого короля
                 {
