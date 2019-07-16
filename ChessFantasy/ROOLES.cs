@@ -2680,19 +2680,26 @@ namespace ChessFantasy
     class FiguresXY //содержит координаты всех фигур игрока кроме короля
     {
         private XY[] _figures;//массив координат
-        public XY[] Array//Свойство чтобы можно было использовать массив в циклах
+        public XY[] Figures//Свойство чтобы можно было использовать массив в циклах
         {
             get { return _figures; }
         }
+        private XY _king;//координаты короля
+        public XY King//Свойство чтобы можно было использовать массив в циклах
+        {
+            get { return _king; }
+        }
 
-        public FiguresXY(XY[] figures)//конструктор из массива
+        public FiguresXY(XY[] figures, XY king)//конструктор из массива
         {
             _figures = figures;
+            _king = king;
         }
 
         public FiguresXY(FiguresXY a)//конструктор копирования
         {
             _figures = a._figures;
+            _king = a._king;
         }
 
         public FiguresXY(Color color)//конструктор для начальной позиции шахмат
@@ -2712,6 +2719,8 @@ namespace ChessFantasy
                         p++;
                     }
                 }
+                TempXY = new XY(7, 4);
+                _king = TempXY;
             }
             else
             {
@@ -2724,6 +2733,8 @@ namespace ChessFantasy
                         p++;
                     }
                 }
+                TempXY = new XY(0, 4);
+                _king = TempXY;
             }
             _figures = OutFigures;
         }
