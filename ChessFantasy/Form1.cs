@@ -23,13 +23,23 @@ namespace ChessFantasy
             Bitmap Bmp = new Bitmap(picture.Width, picture.Height);
             Graphics Graph = Graphics.FromImage(Bmp);
             // Create image.
-            Image newImage = Image.FromFile("D:\\VICTOR\\ChessFantasy\\ChessFantasy\\bin\\Debug\\Resources\\BlackCell.png");
+            Image newImage = Image.FromFile("Resources\\BlackCell.png");
 
-            // Create Point for upper-left corner of image.
-            Point ulCorner = new Point(100, 100);
+            
+            Point ulCorner = new Point(0, 100);// Create Point for upper-left corner of image
+            Graph.DrawImage(newImage, ulCorner);// Draw image to screen
 
-            // Draw image to screen.
-            Graph.DrawImage(newImage, ulCorner);
+            ulCorner = new Point(100, 0);// Create Point for upper-left corner of image
+            Graph.DrawImage(newImage, ulCorner);// Draw image to screen
+            newImage = Image.FromFile("Resources\\WhiteCell.png");
+            ulCorner = new Point(700, 700);// Create Point for upper-left corner of image
+            Graph.DrawImage(newImage, ulCorner);// Draw image to screen
+            newImage = Image.FromFile("Resources\\BlackKing.png");
+            ulCorner = new Point(0, 100);// Create Point for upper-left corner of image
+            Graph.DrawImage(newImage, ulCorner);// Draw image to screen
+            newImage = Image.FromFile("Resources\\WhiteKnight.png");
+            ulCorner = new Point(100, 0);// Create Point for upper-left corner of image
+            Graph.DrawImage(newImage, ulCorner);// Draw image to screen
 
             picture.Image = Bmp;
         }

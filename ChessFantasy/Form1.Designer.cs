@@ -37,7 +37,7 @@
             this.picture.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picture.Location = new System.Drawing.Point(0, 0);
             this.picture.Name = "picture";
-            this.picture.Size = new System.Drawing.Size(989, 755);
+            this.picture.Size = new System.Drawing.Size(800, 800);
             this.picture.TabIndex = 0;
             this.picture.TabStop = false;
             // 
@@ -45,7 +45,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(989, 755);
+            this.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.ClientSize = new System.Drawing.Size(800, 800);
             this.Controls.Add(this.picture);
             this.Name = "Form1";
             this.Text = "Form1";
