@@ -40,6 +40,7 @@
             this.picture.Size = new System.Drawing.Size(800, 800);
             this.picture.TabIndex = 0;
             this.picture.TabStop = false;
+            this.picture.Click += new System.EventHandler(this.Picture_Click);
             // 
             // Form1
             // 

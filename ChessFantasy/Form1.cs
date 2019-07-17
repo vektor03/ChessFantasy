@@ -16,6 +16,7 @@ namespace ChessFantasy
         {
             InitializeComponent();
             Draw();
+            MoveCursor();
         }
 
         private void Draw()
@@ -37,11 +38,21 @@ namespace ChessFantasy
             newImage = Image.FromFile("Resources\\BlackKing.png");
             ulCorner = new Point(0, 100);// Create Point for upper-left corner of image
             Graph.DrawImage(newImage, ulCorner);// Draw image to screen
-            newImage = Image.FromFile("Resources\\WhiteKnight.png");
+            newImage = Image.FromFile("Resources\\WhiteKing.png");
             ulCorner = new Point(100, 0);// Create Point for upper-left corner of image
             Graph.DrawImage(newImage, ulCorner);// Draw image to screen
 
+            //System.Windows.Forms.Cursor.Position
+
             picture.Image = Bmp;
+        }
+
+        private void MoveCursor()
+        {
+            // Set the Current cursor, move the cursor's Position,
+
+            this.Cursor = new Cursor(Cursor.Current.Handle);
+            Cursor.Position = new Point(Cursor.Position.X - 500, Cursor.Position.Y - 500);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -50,6 +61,11 @@ namespace ChessFantasy
         }
 
         private void PictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Picture_Click(object sender, EventArgs e)
         {
 
         }

@@ -23,10 +23,37 @@ namespace ChessFantasy
         BlackKing = 12
     }
     enum Color { White = 0, Black = 1}
-
-    class Board //содержит доску с фигурами и все дествия с ней
+    enum MoveType
     {
-        private Cell[,] _board; // доска
+        //TODO: Добавить ход когда кушается что-то ага
+        Normal = 0,//Обычный ход
+        WhiteLeftEmpassant = 1,
+        WhiteRightEmpassant = 2,
+        WhiteLeftRogue = 3,
+        WhiteRightRogue = 4,
+        BlackLeftEmpassant = 5,
+        BlackRightEmpassant = 6,
+        BlackLeftRogue = 7,
+        BlackRightRogue = 8
+    }
+
+    class Board //содержит доску с фигурами и все дествия с ней, а также всю информацию для игры
+    {
+        //Флаги о том что белый и черный игроки двигали королей и ладьи (для рокировки)
+        private bool _flagWLRookMoved = false;//Белая левая ладья уже делала ход
+        public bool WLRookMoved { get { return _flagWLRookMoved; } }//Белая левая ладья уже делала ход
+        private bool _flagWRRookMoved = false;//Белая правая ладья уже делала ход 
+        public bool WRRookMoved { get { return _flagWRRookMoved; } }//Белая правая ладья уже делала ход 
+        private bool _flagWKingMoved = false;//Белы король уже делала ход 
+        public bool WKingMoved { get { return _flagWKingMoved; } }//Белы король уже делала ход 
+        private bool _flagBLRookMoved = false;//Черная левая ладья уже делала ход
+        public bool BLRookMoved { get { return _flagBLRookMoved; } }//Черная левая ладья уже делала ход
+        private bool _flagBRRookMoved = false;//Черная правая ладья уже делала ход 
+        public bool BRRookMoved { get { return _flagBRRookMoved; } }//Черная правая ладья уже делала ход 
+        private bool _flagBKingMoved = false;//Черный король уже делала ход 
+        public bool BKingMoved { get { return _flagBKingMoved; } }//Черный король уже делала ход 
+
+        private Cell[,] _board; //Сама доска, массив 8х8 в котором записано состояние каждой клетки
         public Cell[,] BoardArr//Свойства чтобы можно было снаружи смотреть массив
         {
             get { return _board; }
@@ -51,6 +78,7 @@ namespace ChessFantasy
 
         /// <summary>
         /// Возвращает доску с примененным ходом без проверки на правила
+        /// TODO: Если ход пешкой то нужно проверить на взятие на проходе
         /// </summary>
         Board DoMove(Board board, Move move)
         {
@@ -2642,8 +2670,7 @@ namespace ChessFantasy
 
     class Move //содержит координаты начала и конца хода
     {
-        private XY[] _move;
-
+        private XY[] _move;//массив в котором лежат координаты начала и конца хода
         public XY XY1//Свойства чтобы можно было смотреть позиции начала и конца хода
         {
             get { return _move[0]; }
@@ -2652,6 +2679,8 @@ namespace ChessFantasy
         {
             get { return _move[1]; }
         }
+
+        private MoveType _moveType = MoveType.Normal;//тип хода
 
         public Move(int r1, int c1, int r2, int c2)//конструктор из координат хода, может не нужен
         {
