@@ -51,8 +51,8 @@ namespace ChessFantasy
         {
             // Set the Current cursor, move the cursor's Position,
 
-            this.Cursor = new Cursor(Cursor.Current.Handle);
-            Cursor.Position = new Point(Cursor.Position.X - 500, Cursor.Position.Y - 500);
+            //this.Cursor = new Cursor(Cursor.Current.Handle);
+            //Cursor.Position = new Point(Cursor.Position.X - 500, Cursor.Position.Y - 500);
         }
 
         private void Form1_Load(object sender, EventArgs e)
