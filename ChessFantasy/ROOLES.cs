@@ -25,7 +25,6 @@ namespace ChessFantasy
     enum Color { White = 0, Black = 1}
     enum MoveType
     {
-        
         Moving = 0,//Ход-перемещение фигуры
         Taking = 1,//Ход-взятие фигуры
         WhiteLeftEmpassant = 2,//белая пешка берет на проходе черную пешку слева
