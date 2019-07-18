@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+//TODO: Сделать все условия при поиске всех ходов через else if
 namespace ChessFantasy
 {
     enum Cell
@@ -74,10 +75,8 @@ namespace ChessFantasy
 
         /// <summary>
         /// Возвращает доску с примененным ходом без проверки на правила
-        /// TODO: Если ход пешкой то нужно проверить на взятие на проходе
-        /// TODO: Рокировки
         /// </summary>
-        Board DoMove(Board board, Move move)
+        Board DoMove(Board board, Move move, Color color)
         {
             //если координаты хода находятся на доске
             if ((move.XY1.r > 0) & (move.XY1.r < 7) & (move.XY1.c > 0) & (move.XY1.c < 7) &
@@ -85,8 +84,72 @@ namespace ChessFantasy
             {
                 Board boardOut = board;//доска с выполненным ходом
                 Cell Figure = boardOut._board[move.XY1.r, move.XY1.c];//фигура которой мы ходим
+
                 boardOut._board[move.XY1.r, move.XY1.c] = Cell.Empty;//клетка с которой начинался ход обнуляется
                 boardOut._board[move.XY2.r, move.XY2.c] = Figure;//клетка, где заканчивается ход, занимается фигурой
+
+                if (color == Color.White)//Если это какой-то экзотический ход типа взятия на проходе или рокировки, то нужно знать цвет фигуры
+                {
+                    if (Figure == Cell.WhiteKing)
+                    {
+                        board._WLRogueAvailable = false;
+                        board._WRRogueAvailable = false;
+                    }
+                    else if ((Figure == Cell.WhiteRook) & (move.XY1.r == 7) & (move.XY1.c == 0))
+                        { board._WLRogueAvailable = false; }
+                    else if((Figure == Cell.WhiteRook) & (move.XY1.r == 7) & (move.XY1.c == 7))
+                        { board._WRRogueAvailable = false; }
+
+                    if (move._moveType == MoveType.WhiteLeftEmpassant)//взятие на проходе белой пешкой влево
+                    {
+                        boardOut._board[move.XY1.r, move.XY1.c - 1] = Cell.Empty;//клетка на которой стояла вражеская пешка обнуляется
+                    }
+                    else if (move._moveType == MoveType.WhiteRightEmpassant)//взятие на проходе белой пешкой вправо
+                    {
+                        boardOut._board[move.XY1.r, move.XY1.c + 1] = Cell.Empty;//клетка на которой стояла вражеская пешка обнуляется
+                    }
+                    else if (move._moveType == MoveType.WhiteLeftRogue)//рокировка белого короля влево
+                    {
+                        boardOut._board[7, 0] = Cell.Empty;//клетка на которой стояла ладья обнуляется
+                        boardOut._board[7, 3] = Cell.WhiteRook;//ладья переставляется
+                    }
+                    else if (move._moveType == MoveType.WhiteRightRogue)//рокировка белого короля вправо
+                    {
+                        boardOut._board[7, 0] = Cell.Empty;//клетка на которой стояла ладья обнуляется
+                        boardOut._board[7, 3] = Cell.WhiteRook;//ладья переставляется
+                    }
+                }
+                else //Ходим черными фигурами рокировку и взятие на проходе
+                {
+                    if (Figure == Cell.BlackKing)
+                    {
+                        board._BLRogueAvailable = false;
+                        board._BRRogueAvailable = false;
+                    }
+                    else if ((Figure == Cell.BlackRook) & (move.XY1.r == 0) & (move.XY1.c == 0))
+                    { board._BLRogueAvailable = false; }
+                    else if ((Figure == Cell.BlackRook) & (move.XY1.r == 0) & (move.XY1.c == 7))
+                    { board._BRRogueAvailable = false; }
+
+                    if (move._moveType == MoveType.BlackLeftEmpassant)//взятие на проходе белой пешкой влево
+                    {
+                        boardOut._board[move.XY1.r, move.XY1.c - 1] = Cell.Empty;//клетка на которой стояла вражеская пешка обнуляется
+                    }
+                    else if (move._moveType == MoveType.BlackRightEmpassant)//взятие на проходе белой пешкой вправо
+                    {
+                        boardOut._board[move.XY1.r, move.XY1.c + 1] = Cell.Empty;//клетка на которой стояла вражеская пешка обнуляется
+                    }
+                    else if (move._moveType == MoveType.BlackLeftRogue)//рокировка черного короля влево
+                    {
+                        boardOut._board[0, 0] = Cell.Empty;//клетка на которой стояла ладья обнуляется
+                        boardOut._board[0, 3] = Cell.BlackRook;//ладья переставляется
+                    }
+                    else if (move._moveType == MoveType.BlackRightRogue)//рокировка черного короля вправо
+                    {
+                        boardOut._board[0, 0] = Cell.Empty;//клетка на которой стояла ладья обнуляется
+                        boardOut._board[0, 3] = Cell.BlackRook;//ладья переставляется
+                    }
+                }
 
                 return boardOut;
             }
@@ -1826,8 +1889,6 @@ namespace ChessFantasy
 
         /// <summary>
         /// Поиск всех ходов, которые может совершить король
-        /// TODO: Рокировка
-        /// TODO: любой ход приводет к потере права на рокировку
         /// </summary>
         Move[] FindKingMoves(XY kingXY, Board board, Color color, FiguresXY enemyFigures)
         {
