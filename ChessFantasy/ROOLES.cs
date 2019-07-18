@@ -41,18 +41,10 @@ namespace ChessFantasy
     class Board //содержит доску с фигурами и все дествия с ней, а также всю информацию для игры
     {
         //Флаги о том что белый и черный игроки двигали королей и ладьи (для рокировки)
-        private bool _flagWLRookMoved = false;//Белая левая ладья уже делала ход
-        public bool WLRookMoved { get { return _flagWLRookMoved; } }//Белая левая ладья уже делала ход
-        private bool _flagWRRookMoved = false;//Белая правая ладья уже делала ход 
-        public bool WRRookMoved { get { return _flagWRRookMoved; } }//Белая правая ладья уже делала ход 
-        private bool _flagWKingMoved = false;//Белы король уже делала ход 
-        public bool WKingMoved { get { return _flagWKingMoved; } }//Белы король уже делала ход 
-        private bool _flagBLRookMoved = false;//Черная левая ладья уже делала ход
-        public bool BLRookMoved { get { return _flagBLRookMoved; } }//Черная левая ладья уже делала ход
-        private bool _flagBRRookMoved = false;//Черная правая ладья уже делала ход 
-        public bool BRRookMoved { get { return _flagBRRookMoved; } }//Черная правая ладья уже делала ход 
-        private bool _flagBKingMoved = false;//Черный король уже делала ход 
-        public bool BKingMoved { get { return _flagBKingMoved; } }//Черный король уже делала ход 
+        public bool _WLRogueAvailable = true;//У белых есть право на длинную рокировку (левая ладья и король не делали ход)
+        public bool _WRRogueAvailable = true;//У белых есть право на короткую рокировку (правая ладья и король не делали ход)
+        public bool _BLRogueAvailable = true;//У черных есть право на длинную рокировку (левая ладья и король не делали ход)
+        public bool _BRRogueAvailable = true;//У черных есть право на короткую рокировку (правая ладья и король не делали ход)
 
         private Cell[,] _board; //Сама доска, массив 8х8 в котором записано состояние каждой клетки
         public Cell[,] BoardArr//Свойства чтобы можно было снаружи смотреть массив
@@ -75,7 +67,11 @@ namespace ChessFantasy
         public Board(Board a)//конструктор копирования
         {
             _board = a._board;
-        }
+            _WLRogueAvailable = a._WLRogueAvailable;
+            _WRRogueAvailable = a._WRRogueAvailable;
+            _BLRogueAvailable = a._BLRogueAvailable;
+            _BRRogueAvailable = a._BRRogueAvailable;
+    }
 
         /// <summary>
         /// Возвращает доску с примененным ходом без проверки на правила
@@ -473,7 +469,6 @@ namespace ChessFantasy
 
         /// <summary>
         /// Поиск всех ходов, которые может совершить конь
-        /// TODO: немного упростить вычисления в условиях
         /// </summary>
         Move[] FindKnightMoves(XY knightXY, Board board, Color color, XY kingXY, FiguresXY enemyFigures)
         {
@@ -491,7 +486,7 @@ namespace ChessFantasy
                 //атака белым конем на 1 час
                 rMove = knightXY.r - 2;
                 cMove = knightXY.c + 1;
-                if ((knightXY.r - 2 > 0) & (knightXY.c + 1 < 7) &
+                if ((rMove > 0) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -515,7 +510,7 @@ namespace ChessFantasy
                 //атака белым конем на 2 часа
                 rMove = knightXY.r - 1;
                 cMove = knightXY.c + 2;
-                if ((knightXY.r - 1 > 0) & (knightXY.c + 2 < 7) &
+                if ((rMove > 0) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -548,7 +543,7 @@ namespace ChessFantasy
                 //атака белым конем на 4 часа
                 rMove = knightXY.r + 1;
                 cMove = knightXY.c + 2;
-                if ((knightXY.r + 1 < 7) & (knightXY.c + 2 < 7) &
+                if ((rMove < 7) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -586,7 +581,7 @@ namespace ChessFantasy
                 //атака белым конем на 5 часов
                 rMove = knightXY.r + 2;
                 cMove = knightXY.c + 1;
-                if ((knightXY.r + 2 < 7) & (knightXY.c + 1 < 7) &
+                if ((rMove < 7) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -624,7 +619,7 @@ namespace ChessFantasy
                 //атака белым конем на 7 часов
                 rMove = knightXY.r + 2;
                 cMove = knightXY.c - 1;
-                if ((knightXY.r + 2 < 7) & (knightXY.c - 1 > 0) &
+                if ((rMove < 7) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -662,7 +657,7 @@ namespace ChessFantasy
                 //атака белым конем на 8 часов
                 rMove = knightXY.r + 1;
                 cMove = knightXY.c - 2;
-                if ((knightXY.r + 1 < 7) & (knightXY.c - 2 > 0) &
+                if ((rMove < 7) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -700,7 +695,7 @@ namespace ChessFantasy
                 //атака белым конем на 10 часов
                 rMove = knightXY.r - 1;
                 cMove = knightXY.c - 2;
-                if ((knightXY.r - 1 > 0) & (knightXY.c - 2 > 0) &
+                if ((rMove > 0) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -738,7 +733,7 @@ namespace ChessFantasy
                 //атака белым конем на 11 часов
                 rMove = knightXY.r - 2;
                 cMove = knightXY.c - 1;
-                if ((knightXY.r - 2 > 0) & (knightXY.c - 1 > 0) &
+                if ((rMove > 0) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.BlackPawn) |
                     (board._board[rMove, cMove] == Cell.BlackKnight) |
                     (board._board[rMove, cMove] == Cell.BlackBishop) |
@@ -778,7 +773,7 @@ namespace ChessFantasy
                 //атака черным конем на 1 час
                 rMove = knightXY.r - 2;
                 cMove = knightXY.c + 1;
-                if ((knightXY.r - 2 > 0) & (knightXY.c + 1 < 7) &
+                if ((rMove > 0) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -802,7 +797,7 @@ namespace ChessFantasy
                 //атака черным конем на 2 часа
                 rMove = knightXY.r - 1;
                 cMove = knightXY.c + 2;
-                if ((knightXY.r - 1 > 0) & (knightXY.c + 2 < 7) &
+                if ((rMove > 0) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -835,7 +830,7 @@ namespace ChessFantasy
                 //атака черным конем на 4 часа
                 rMove = knightXY.r + 1;
                 cMove = knightXY.c + 2;
-                if ((knightXY.r + 1 < 7) & (knightXY.c + 2 < 7) &
+                if ((rMove < 7) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -873,7 +868,7 @@ namespace ChessFantasy
                 //атака черным конем на 5 часов
                 rMove = knightXY.r + 2;
                 cMove = knightXY.c + 1;
-                if ((knightXY.r + 2 < 7) & (knightXY.c + 1 < 7) &
+                if ((rMove < 7) & (cMove < 7) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -911,7 +906,7 @@ namespace ChessFantasy
                 //атака черным конем на 7 часов
                 rMove = knightXY.r + 2;
                 cMove = knightXY.c - 1;
-                if ((knightXY.r + 2 < 7) & (knightXY.c - 1 > 0) &
+                if ((rMove < 7) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -949,7 +944,7 @@ namespace ChessFantasy
                 //атака черным конем на 8 часов
                 rMove = knightXY.r + 1;
                 cMove = knightXY.c - 2;
-                if ((knightXY.r + 1 < 7) & (knightXY.c - 2 > 0) &
+                if ((rMove < 7) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -987,7 +982,7 @@ namespace ChessFantasy
                 //атака черным конем на 10 часов
                 rMove = knightXY.r - 1;
                 cMove = knightXY.c - 2;
-                if ((knightXY.r - 1 > 0) & (knightXY.c - 2 > 0) &
+                if ((rMove > 0) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -1025,7 +1020,7 @@ namespace ChessFantasy
                 //атака черным конем на 11 часов
                 rMove = knightXY.r - 2;
                 cMove = knightXY.c - 1;
-                if ((knightXY.r - 2 > 0) & (knightXY.c - 1 > 0) &
+                if ((rMove > 0) & (cMove > 0) &
                     ((board._board[rMove, cMove] == Cell.WhitePawn) |
                     (board._board[rMove, cMove] == Cell.WhiteKnight) |
                     (board._board[rMove, cMove] == Cell.WhiteBishop) |
@@ -1065,7 +1060,6 @@ namespace ChessFantasy
         }
 
         /// <summary>
-        /// TODO: Упростить обсчет условий, сохранив координаты
         /// Поиск всех ходов, которые может совершить слон
         /// </summary>
         Move[] FindBishopMoves(XY bishopXY, Board board, Color color, XY kingXY, FiguresXY enemyFigures)
@@ -1077,21 +1071,27 @@ namespace ChessFantasy
             int Count = 0; //количество найденных ходов слона
             int j;
 
+            int rMove = -1;//Координаты искомого хода, строка
+            int cMove = -1;//Координаты искомого хода, солбец
+
             if (color == Color.White)//ищем ходы белого слона
             {
                 //атака белым слоном на верх-право
                 j = 1;
-                while ((bishopXY.r - j > 0) & (bishopXY.c + j < 7) &
-                    ((board._board[bishopXY.r - j, bishopXY.c + j] == Cell.BlackPawn) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.BlackKnight) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.BlackBishop) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.BlackRook) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.BlackQueen) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.BlackKing) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.Empty)))
+                rMove = bishopXY.r - j;
+                cMove = bishopXY.c + j;
+                
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r - j, bishopXY.c + j);
-                    if (board._board[bishopXY.r - j, bishopXY.c + j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1120,17 +1120,20 @@ namespace ChessFantasy
 
                 //атака белым слоном вниз-вправо
                 j = 1;
-                while ((bishopXY.r + j > 0) & (bishopXY.c + j < 7) &
-                    ((board._board[bishopXY.r + j, bishopXY.c + j] == Cell.BlackPawn) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.BlackKnight) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.BlackBishop) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.BlackRook) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.BlackQueen) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.BlackKing) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.Empty)))
+                rMove = bishopXY.r + j;
+                cMove = bishopXY.c + j;
+                
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r + j, bishopXY.c + j);
-                    if (board._board[bishopXY.r + j, bishopXY.c + j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1158,17 +1161,19 @@ namespace ChessFantasy
 
                 //атака белым слоном вниз-влево
                 j = 1;
-                while ((bishopXY.r + j > 0) & (bishopXY.c - j < 7) &
-                    ((board._board[bishopXY.r + j, bishopXY.c - j] == Cell.BlackPawn) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.BlackKnight) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.BlackBishop) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.BlackRook) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.BlackQueen) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.BlackKing) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.Empty)))
+                rMove = bishopXY.r + j;
+                cMove = bishopXY.c - j;
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r + j, bishopXY.c - j);
-                    if (board._board[bishopXY.r + j, bishopXY.c - j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1196,17 +1201,19 @@ namespace ChessFantasy
 
                 //атака белым слоном вверх-влево
                 j = 1;
-                while ((bishopXY.r - j > 0) & (bishopXY.c - j < 7) &
-                    ((board._board[bishopXY.r - j, bishopXY.c - j] == Cell.BlackPawn) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.BlackKnight) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.BlackBishop) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.BlackRook) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.BlackQueen) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.BlackKing) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.Empty)))
+                rMove = bishopXY.r - j;
+                cMove = bishopXY.c - j;
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r - j, bishopXY.c - j);
-                    if (board._board[bishopXY.r - j, bishopXY.c - j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1237,17 +1244,19 @@ namespace ChessFantasy
             {
                 //атака черным слоном на верх-право
                 j = 1;
-                while ((bishopXY.r - j > 0) & (bishopXY.c + j < 7) &
-                    ((board._board[bishopXY.r - j, bishopXY.c + j] == Cell.WhitePawn) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.WhiteKnight) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.WhiteBishop) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.WhiteRook) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.WhiteQueen) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.WhiteKing) |
-                    (board._board[bishopXY.r - j, bishopXY.c + j] == Cell.Empty)))
+                rMove = bishopXY.r - j;
+                cMove = bishopXY.c + j;
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r - j, bishopXY.c + j);
-                    if (board._board[bishopXY.r - j, bishopXY.c + j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1275,17 +1284,19 @@ namespace ChessFantasy
 
                 //атака черным слоном вниз-вправо
                 j = 1;
-                while ((bishopXY.r + j > 0) & (bishopXY.c + j < 7) &
-                    ((board._board[bishopXY.r + j, bishopXY.c + j] == Cell.WhitePawn) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.WhiteKnight) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.WhiteBishop) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.WhiteRook) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.WhiteQueen) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.WhiteKing) |
-                    (board._board[bishopXY.r + j, bishopXY.c + j] == Cell.Empty)))
+                rMove = bishopXY.r + j;
+                cMove = bishopXY.c + j;
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r + j, bishopXY.c + j);
-                    if (board._board[bishopXY.r + j, bishopXY.c + j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1313,17 +1324,19 @@ namespace ChessFantasy
 
                 //атака черным слоном вниз-влево
                 j = 1;
-                while ((bishopXY.r + j > 0) & (bishopXY.c - j < 7) &
-                    ((board._board[bishopXY.r + j, bishopXY.c - j] == Cell.WhitePawn) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.WhiteKnight) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.WhiteBishop) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.WhiteRook) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.WhiteQueen) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.WhiteKing) |
-                    (board._board[bishopXY.r + j, bishopXY.c - j] == Cell.Empty)))
+                rMove = bishopXY.r + j;
+                cMove = bishopXY.c - j;
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r + j, bishopXY.c - j);
-                    if (board._board[bishopXY.r + j, bishopXY.c - j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1351,17 +1364,19 @@ namespace ChessFantasy
 
                 //атака черным слоном вверх-влево
                 j = 1;
-                while ((bishopXY.r - j > 0) & (bishopXY.c - j < 7) &
-                    ((board._board[bishopXY.r - j, bishopXY.c - j] == Cell.WhitePawn) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.WhiteKnight) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.WhiteBishop) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.WhiteRook) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.WhiteQueen) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.WhiteKing) |
-                    (board._board[bishopXY.r - j, bishopXY.c - j] == Cell.Empty)))
+                rMove = bishopXY.r - j;
+                cMove = bishopXY.c - j;
+                while ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(bishopXY, bishopXY.r - j, bishopXY.c - j);
-                    if (board._board[bishopXY.r - j, bishopXY.c - j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(bishopXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1403,21 +1418,27 @@ namespace ChessFantasy
             int Count = 0; //количество найденных ходов ладьи
             int j;
 
+            int rMove = -1;//Координаты искомого хода, строка
+            int cMove = -1;//Координаты искомого хода, солбец
+
             if (color == Color.White)//ищем ходы белой ладьи
             {
                 //атака белой ладьей вправо
                 j = 1;
+                rMove = rookXY.r;
+                cMove = rookXY.c + j;
+
                 while ((rookXY.c + j < 7) &
-                    ((board._board[rookXY.r, rookXY.c + j] == Cell.BlackPawn) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.BlackKnight) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.BlackBishop) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.BlackRook) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.BlackQueen) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.BlackKing) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r, rookXY.c + j);
-                    if (board._board[rookXY.r, rookXY.c + j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1446,17 +1467,20 @@ namespace ChessFantasy
 
                 //атака белой ладьей вниз
                 j = 1;
+                rMove = rookXY.r + j;
+                cMove = rookXY.c;
+
                 while ((rookXY.r + j < 7) &
-                    ((board._board[rookXY.r + j, rookXY.c] == Cell.BlackPawn) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.BlackKnight) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.BlackBishop) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.BlackRook) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.BlackQueen) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.BlackKing) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r + j, rookXY.c);
-                    if (board._board[rookXY.r + j, rookXY.c] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1483,19 +1507,22 @@ namespace ChessFantasy
                     
                 }
 
-                //атака белой ладьей вправо
+                //атака белой ладьей влево
                 j = 1;
+                rMove = rookXY.r;
+                cMove = rookXY.c - j;
+
                 while ((rookXY.c - j > 0) &
-                    ((board._board[rookXY.r, rookXY.c - j] == Cell.BlackPawn) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.BlackKnight) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.BlackBishop) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.BlackRook) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.BlackQueen) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.BlackKing) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r, rookXY.c - j);
-                    if (board._board[rookXY.r, rookXY.c - j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1521,19 +1548,22 @@ namespace ChessFantasy
                     }
                 }
 
-                //атака белой ладьей вправо
+                //атака белой ладьей вверх
                 j = 1;
+                rMove = rookXY.r - j;
+                cMove = rookXY.c;
+
                 while ((rookXY.r - j > 0) &
-                    ((board._board[rookXY.r - j, rookXY.c] == Cell.BlackPawn) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.BlackKnight) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.BlackBishop) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.BlackRook) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.BlackQueen) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.BlackKing) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r - j, rookXY.c);
-                    if (board._board[rookXY.r - j, rookXY.c] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1564,17 +1594,20 @@ namespace ChessFantasy
             {
                 //атака черной ладьей вправо
                 j = 1;
+                rMove = rookXY.r;
+                cMove = rookXY.c + j;
+
                 while ((rookXY.c + j < 7) &
-                    ((board._board[rookXY.r, rookXY.c + j] == Cell.WhitePawn) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.WhiteKnight) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.WhiteBishop) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.WhiteRook) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.WhiteQueen) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.WhiteKing) |
-                    (board._board[rookXY.r, rookXY.c + j] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r, rookXY.c + j);
-                    if (board._board[rookXY.r, rookXY.c + j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1602,17 +1635,20 @@ namespace ChessFantasy
 
                 //атака черной ладьей вниз
                 j = 1;
+                rMove = rookXY.r + j;
+                cMove = rookXY.c;
+
                 while ((rookXY.r + j < 7) &
-                    ((board._board[rookXY.r + j, rookXY.c] == Cell.WhitePawn) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.WhiteKnight) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.WhiteBishop) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.WhiteRook) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.WhiteQueen) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.WhiteKing) |
-                    (board._board[rookXY.r + j, rookXY.c] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r + j, rookXY.c);
-                    if (board._board[rookXY.r + j, rookXY.c] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1638,19 +1674,22 @@ namespace ChessFantasy
                     }
                 }
 
-                //атака черной ладьей вправо
+                //атака черной ладьей влево
                 j = 1;
+                rMove = rookXY.r;
+                cMove = rookXY.c - j;
+
                 while ((rookXY.c - j > 0) &
-                    ((board._board[rookXY.r, rookXY.c - j] == Cell.WhitePawn) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.WhiteKnight) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.WhiteBishop) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.WhiteRook) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.WhiteQueen) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.WhiteKing) |
-                    (board._board[rookXY.r, rookXY.c - j] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r, rookXY.c - j);
-                    if (board._board[rookXY.r, rookXY.c - j] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1678,17 +1717,20 @@ namespace ChessFantasy
 
                 //атака черной ладьей вправо
                 j = 1;
+                rMove = rookXY.r - j;
+                cMove = rookXY.c;
+
                 while ((rookXY.r - j > 0) &
-                    ((board._board[rookXY.r - j, rookXY.c] == Cell.WhitePawn) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.WhiteKnight) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.WhiteBishop) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.WhiteRook) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.WhiteQueen) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.WhiteKing) |
-                    (board._board[rookXY.r - j, rookXY.c] == Cell.Empty)))
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(rookXY, rookXY.r - j, rookXY.c);
-                    if (board._board[rookXY.r - j, rookXY.c] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(rookXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1785,8 +1827,8 @@ namespace ChessFantasy
 
         /// <summary>
         /// Поиск всех ходов, которые может совершить король
-        /// TODO: королю нельзя приближаться к другому королю
-        /// TODO: королю нельзя подставляться под шах
+        /// TODO: Рокировка
+        /// TODO: любой ход приводет к потере права на рокировку
         /// </summary>
         Move[] FindKingMoves(XY kingXY, Board board, Color color, FiguresXY enemyFigures)
         {
@@ -1797,20 +1839,25 @@ namespace ChessFantasy
             Move Move;
             int Count = 0; //количество найденных ходов пешки
 
+            int rMove = -1;//Координаты искомого хода, строка
+            int cMove = -1;//Координаты искомого хода, солбец
+
             if (color == Color.White)//ищем ходы белого короля
             {
                 //ход белого короля на одну клетку вправо
-                if ((kingXY.c + 1 < 7) &
-                    ((board._board[kingXY.r, kingXY.c + 1] == Cell.BlackPawn) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.BlackKnight) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.BlackBishop) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.BlackRook) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.BlackQueen) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.BlackKing) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.Empty)))
+                rMove = kingXY.r;
+                cMove = kingXY.c + 1;
+                if ((cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r, kingXY.c + 1);
-                    if (board._board[kingXY.r, kingXY.c + 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1822,17 +1869,20 @@ namespace ChessFantasy
                 }
 
                 //ход белого короля на одну клетку вниз
-                if ((kingXY.r + 1 < 7) &
-                    ((board._board[kingXY.r + 1, kingXY.c] == Cell.BlackPawn) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.BlackKnight) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.BlackBishop) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.BlackRook) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.BlackQueen) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.BlackKing) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.Empty)))
+                rMove = kingXY.r + 1;
+                cMove = kingXY.c;
+
+                if ((rMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r + 1, kingXY.c);
-                    if (board._board[kingXY.r + 1, kingXY.c] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1853,17 +1903,20 @@ namespace ChessFantasy
                 }
 
                 //ход белого короля на одну клетку влево
-                if ((kingXY.c - 1 > 0) &
-                    ((board._board[kingXY.r, kingXY.c - 1] == Cell.BlackPawn) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.BlackKnight) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.BlackBishop) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.BlackRook) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.BlackQueen) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.BlackKing) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.Empty)))
+                rMove = kingXY.r;
+                cMove = kingXY.c - 1;
+
+                if ((cMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r, kingXY.c - 1);
-                    if (board._board[kingXY.r, kingXY.c - 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1889,17 +1942,20 @@ namespace ChessFantasy
                 }
 
                 //ход белого короля на одну клетку вверх
-                if ((kingXY.r - 1 > 0) &
-                    ((board._board[kingXY.r - 1, kingXY.c] == Cell.BlackPawn) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.BlackKnight) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.BlackBishop) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.BlackRook) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.BlackQueen) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.BlackKing) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.Empty)))
+                rMove = kingXY.r - 1;
+                cMove = kingXY.c;
+
+                if ((rMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c);
-                    if (board._board[kingXY.r - 1, kingXY.c] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1925,17 +1981,20 @@ namespace ChessFantasy
                 }
 
                 //ход белого короля вверх-вправо
-                if ((kingXY.r - 1 > 0) & (kingXY.c + 1 < 7) &
-                    ((board._board[kingXY.r - 1, kingXY.c + 1] == Cell.BlackPawn) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.BlackKnight) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.BlackBishop) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.BlackRook) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.BlackQueen) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.BlackKing) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.Empty)))
+                rMove = kingXY.r - 1;
+                cMove = kingXY.c + 1;
+
+                if ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c + 1);
-                    if (board._board[kingXY.r - 1, kingXY.c + 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1961,17 +2020,20 @@ namespace ChessFantasy
                 }
 
                 //ход белого короля вниз-вправо
-                if ((kingXY.r + 1 < 7) & (kingXY.c + 1 < 7) &
-                    ((board._board[kingXY.r + 1, kingXY.c + 1] == Cell.BlackPawn) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.BlackKnight) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.BlackBishop) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.BlackRook) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.BlackQueen) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.BlackKing) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.Empty)))
+                rMove = kingXY.r + 1;
+                cMove = kingXY.c + 1;
+
+                if ((rMove < 7) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r + 1, kingXY.c + 1);
-                    if (board._board[kingXY.r + 1, kingXY.c + 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -1997,17 +2059,20 @@ namespace ChessFantasy
                 }
 
                 //ход белого короля вниз-влево
-                if ((kingXY.r + 1 < 7) & (kingXY.c - 1 > 0) &
-                    ((board._board[kingXY.r + 1, kingXY.c - 1] == Cell.BlackPawn) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.BlackKnight) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.BlackBishop) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.BlackRook) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.BlackQueen) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.BlackKing) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.Empty)))
+                rMove = kingXY.r + 1;
+                cMove = kingXY.c - 1;
+
+                if ((rMove < 7) & (cMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r + 1, kingXY.c - 1);
-                    if (board._board[kingXY.r + 1, kingXY.c - 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -2033,17 +2098,20 @@ namespace ChessFantasy
                 }
 
                 //ход белого короля вверх-влево
-                if ((kingXY.r - 1 > 0) & (kingXY.c - 1 > 0) &
-                    ((board._board[kingXY.r - 1, kingXY.c - 1] == Cell.BlackPawn) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.BlackKnight) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.BlackBishop) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.BlackRook) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.BlackQueen) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.BlackKing) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.Empty)))
+                rMove = kingXY.r - 1;
+                cMove = kingXY.c - 1;
+
+                if ((rMove > 0) & (cMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.BlackPawn) |
+                    (board._board[rMove, cMove] == Cell.BlackKnight) |
+                    (board._board[rMove, cMove] == Cell.BlackBishop) |
+                    (board._board[rMove, cMove] == Cell.BlackRook) |
+                    (board._board[rMove, cMove] == Cell.BlackQueen) |
+                    (board._board[rMove, cMove] == Cell.BlackKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c - 1);
-                    if (board._board[kingXY.r - 1, kingXY.c - 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
                     CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
@@ -2067,186 +2135,366 @@ namespace ChessFantasy
                         }
                     }
                 }
+
+                //ход белого короля: левая рокировка
+                if ((board._WLRogueAvailable) & (board._board[7, 1] == Cell.Empty) &//рокировка доступна
+                    (board._board[7, 2] == Cell.Empty) & (board._board[7, 3] == Cell.Empty) &//нужные поля свободны
+                    (!CheckCheck(kingXY, board, color, enemyFigures)) &//король не попадает под шах нигде на протяжении рокировки
+                    (!CheckCheck(new XY(7, 2), board, color, enemyFigures)) &
+                    (!CheckCheck(new XY(7, 3), board, color, enemyFigures)))
+                {
+                    Move = new Move(kingXY, 7, 2);
+                    Move._moveType = MoveType.WhiteLeftRogue;//Для Board.DoMove чтоб знать какие фигуры двигать
+
+                    if (Count > 0)
+                    {
+                        Temp = Moves;
+                        Moves = new Move[Count + 1];
+                        for (int i = 0; i < Count; i++)
+                        {
+                            Moves[i] = Temp[i];
+                        }
+                        Moves[Count] = Move;
+                        Count++;
+                    }
+                    else
+                    {
+                        Moves = new Move[] { Move };
+                        Count = 1;
+                    }
+                }
+
+                //ход белого короля: правая рокировка
+                if ((board._WRRogueAvailable) & (board._board[7, 5] == Cell.Empty) &//рокировка доступна
+                    (board._board[7, 6] == Cell.Empty) &//нужные поля свободны
+                    (!CheckCheck(kingXY, board, color, enemyFigures)) &//король не попадает под шах нигде на протяжении рокировки
+                    (!CheckCheck(new XY(7, 5), board, color, enemyFigures)) &
+                    (!CheckCheck(new XY(7, 6), board, color, enemyFigures)))
+                {
+                    Move = new Move(kingXY, 7, 6);
+                    Move._moveType = MoveType.WhiteRightRogue;//Для Board.DoMove чтоб знать какие фигуры двигать
+
+                    if (Count > 0)
+                    {
+                        Temp = Moves;
+                        Moves = new Move[Count + 1];
+                        for (int i = 0; i < Count; i++)
+                        {
+                            Moves[i] = Temp[i];
+                        }
+                        Moves[Count] = Move;
+                        Count++;
+                    }
+                    else
+                    {
+                        Moves = new Move[] { Move };
+                        Count = 1;
+                    }
+                }
             }
             else//Если мы ищем атаки черного короля
             {
                 //ход черного короля на одну клетку вправо
-                if ((kingXY.c + 1 < 7) &
-                    ((board._board[kingXY.r, kingXY.c + 1] == Cell.WhitePawn) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.WhiteRook) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.WhiteKing) |
-                    (board._board[kingXY.r, kingXY.c + 1] == Cell.Empty)))
+                rMove = kingXY.r;
+                cMove = kingXY.c + 1;
+                if ((cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r, kingXY.c + 1);
-                    if (board._board[kingXY.r, kingXY.c + 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
-                    Moves = new Move[] { Move };
-                    Count = 1;
-                }
-
-                //ход черного короля на одну клетку вниз
-                if ((kingXY.r + 1 < 7) &
-                    ((board._board[kingXY.r + 1, kingXY.c] == Cell.WhitePawn) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.WhiteRook) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.WhiteKing) |
-                    (board._board[kingXY.r + 1, kingXY.c] == Cell.Empty)))
-                {
-                    Move = new Move(kingXY, kingXY.r + 1, kingXY.c);
-                    if (Count == 1)
-                    {
-                        Temp = Moves;
-                        Moves = new Move[] { Temp[0], Move };
-                        Count = 2;
-                    }
-                    else
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
                     {
                         Moves = new Move[] { Move };
                         Count = 1;
+                    }
+                }
+
+                //ход черного короля на одну клетку вниз
+                rMove = kingXY.r + 1;
+                cMove = kingXY.c;
+
+                if ((rMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
+                {
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
+                    {
+                        if (Count == 1)
+                        {
+                            Temp = Moves;
+                            Moves = new Move[] { Temp[0], Move };
+                            Count = 2;
+                        }
+                        else
+                        {
+                            Moves = new Move[] { Move };
+                            Count = 1;
+                        }
                     }
                 }
 
                 //ход черного короля на одну клетку влево
-                if ((kingXY.c - 1 > 0) &
-                    ((board._board[kingXY.r, kingXY.c - 1] == Cell.WhitePawn) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.WhiteRook) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.WhiteKing) |
-                    (board._board[kingXY.r, kingXY.c - 1] == Cell.Empty)))
-                {
-                    Move = new Move(kingXY, kingXY.r, kingXY.c - 1);
-                    if (board._board[kingXY.r, kingXY.c - 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                rMove = kingXY.r;
+                cMove = kingXY.c - 1;
 
-                    if (Count > 0)
+                if ((cMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
+                {
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
                     {
-                        Temp = Moves;
-                        Moves = new Move[Count + 1];
-                        for (int i = 0; i < Count; i++)
+                        if (Count > 0)
                         {
-                            Moves[i] = Temp[i];
+                            Temp = Moves;
+                            Moves = new Move[Count + 1];
+                            for (int i = 0; i < Count; i++)
+                            {
+                                Moves[i] = Temp[i];
+                            }
+                            Moves[Count] = Move;
+                            Count++;
                         }
-                        Moves[Count] = Move;
-                        Count++;
-                    }
-                    else
-                    {
-                        Moves = new Move[] { Move };
-                        Count = 1;
+                        else
+                        {
+                            Moves = new Move[] { Move };
+                            Count = 1;
+                        }
                     }
                 }
 
                 //ход черного короля на одну клетку вверх
-                if ((kingXY.r - 1 > 0) &
-                    ((board._board[kingXY.r - 1, kingXY.c] == Cell.WhitePawn) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.WhiteRook) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.WhiteKing) |
-                    (board._board[kingXY.r - 1, kingXY.c] == Cell.Empty)))
-                {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c);
-                    if (board._board[kingXY.r - 1, kingXY.c] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                rMove = kingXY.r - 1;
+                cMove = kingXY.c;
 
-                    if (Count > 0)
+                if ((rMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
+                {
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
                     {
-                        Temp = Moves;
-                        Moves = new Move[Count + 1];
-                        for (int i = 0; i < Count; i++)
+                        if (Count > 0)
                         {
-                            Moves[i] = Temp[i];
+                            Temp = Moves;
+                            Moves = new Move[Count + 1];
+                            for (int i = 0; i < Count; i++)
+                            {
+                                Moves[i] = Temp[i];
+                            }
+                            Moves[Count] = Move;
+                            Count++;
                         }
-                        Moves[Count] = Move;
-                        Count++;
-                    }
-                    else
-                    {
-                        Moves = new Move[] { Move };
-                        Count = 1;
+                        else
+                        {
+                            Moves = new Move[] { Move };
+                            Count = 1;
+                        }
                     }
                 }
 
                 //ход черного короля вверх-вправо
-                if ((kingXY.r - 1 > 0) & (kingXY.c + 1 < 7) &
-                    ((board._board[kingXY.r - 1, kingXY.c + 1] == Cell.WhitePawn) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.WhiteRook) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.WhiteKing) |
-                    (board._board[kingXY.r - 1, kingXY.c + 1] == Cell.Empty)))
-                {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c + 1);
-                    if (board._board[kingXY.r - 1, kingXY.c + 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                rMove = kingXY.r - 1;
+                cMove = kingXY.c + 1;
 
-                    if (Count > 0)
+                if ((rMove > 0) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
+                {
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
                     {
-                        Temp = Moves;
-                        Moves = new Move[Count + 1];
-                        for (int i = 0; i < Count; i++)
+                        if (Count > 0)
                         {
-                            Moves[i] = Temp[i];
+                            Temp = Moves;
+                            Moves = new Move[Count + 1];
+                            for (int i = 0; i < Count; i++)
+                            {
+                                Moves[i] = Temp[i];
+                            }
+                            Moves[Count] = Move;
+                            Count++;
                         }
-                        Moves[Count] = Move;
-                        Count++;
-                    }
-                    else
-                    {
-                        Moves = new Move[] { Move };
-                        Count = 1;
+                        else
+                        {
+                            Moves = new Move[] { Move };
+                            Count = 1;
+                        }
                     }
                 }
 
                 //ход черного короля вниз-вправо
-                if ((kingXY.r + 1 < 7) & (kingXY.c + 1 < 7) &
-                    ((board._board[kingXY.r + 1, kingXY.c + 1] == Cell.WhitePawn) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.WhiteRook) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.WhiteKing) |
-                    (board._board[kingXY.r + 1, kingXY.c + 1] == Cell.Empty)))
-                {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c + 1);
-                    if (board._board[kingXY.r - 1, kingXY.c + 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                rMove = kingXY.r + 1;
+                cMove = kingXY.c + 1;
 
-                    if (Count > 0)
+                if ((rMove < 7) & (cMove < 7) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
+                {
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
                     {
-                        Temp = Moves;
-                        Moves = new Move[Count + 1];
-                        for (int i = 0; i < Count; i++)
+                        if (Count > 0)
                         {
-                            Moves[i] = Temp[i];
+                            Temp = Moves;
+                            Moves = new Move[Count + 1];
+                            for (int i = 0; i < Count; i++)
+                            {
+                                Moves[i] = Temp[i];
+                            }
+                            Moves[Count] = Move;
+                            Count++;
                         }
-                        Moves[Count] = Move;
-                        Count++;
-                    }
-                    else
-                    {
-                        Moves = new Move[] { Move };
-                        Count = 1;
+                        else
+                        {
+                            Moves = new Move[] { Move };
+                            Count = 1;
+                        }
                     }
                 }
 
                 //ход черного короля вниз-влево
-                if ((kingXY.r + 1 < 7) & (kingXY.c - 1 > 0) &
-                    ((board._board[kingXY.r + 1, kingXY.c - 1] == Cell.WhitePawn) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.WhiteRook) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.WhiteKing) |
-                    (board._board[kingXY.r + 1, kingXY.c - 1] == Cell.Empty)))
+                rMove = kingXY.r + 1;
+                cMove = kingXY.c - 1;
+
+                if ((rMove < 7) & (cMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
                 {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c + 1);
-                    if (board._board[kingXY.r - 1, kingXY.c + 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
+                    {
+                        if (Count > 0)
+                        {
+                            Temp = Moves;
+                            Moves = new Move[Count + 1];
+                            for (int i = 0; i < Count; i++)
+                            {
+                                Moves[i] = Temp[i];
+                            }
+                            Moves[Count] = Move;
+                            Count++;
+                        }
+                        else
+                        {
+                            Moves = new Move[] { Move };
+                            Count = 1;
+                        }
+                    }
+                }
+
+                //ход черного короля вверх-влево
+                rMove = kingXY.r - 1;
+                cMove = kingXY.c - 1;
+
+                if ((rMove > 0) & (cMove > 0) &
+                    ((board._board[rMove, cMove] == Cell.WhitePawn) |
+                    (board._board[rMove, cMove] == Cell.WhiteKnight) |
+                    (board._board[rMove, cMove] == Cell.WhiteBishop) |
+                    (board._board[rMove, cMove] == Cell.WhiteRook) |
+                    (board._board[rMove, cMove] == Cell.WhiteQueen) |
+                    (board._board[rMove, cMove] == Cell.WhiteKing) |
+                    (board._board[rMove, cMove] == Cell.Empty)))
+                {
+                    Move = new Move(kingXY, rMove, cMove);
+                    if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+
+                    //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
+                    CheckKing = CheckCheck(kingXY, board, color, enemyFigures);
+                    if (!CheckKing)
+                    {
+                        if (Count > 0)
+                        {
+                            Temp = Moves;
+                            Moves = new Move[Count + 1];
+                            for (int i = 0; i < Count; i++)
+                            {
+                                Moves[i] = Temp[i];
+                            }
+                            Moves[Count] = Move;
+                            Count++;
+                        }
+                        else
+                        {
+                            Moves = new Move[] { Move };
+                            Count = 1;
+                        }
+                    }
+                }
+
+                //ход черного короля: левая рокировка
+                if ((board._BLRogueAvailable) & (board._board[0, 1] == Cell.Empty) &//рокировка доступна
+                    (board._board[0, 2] == Cell.Empty) & (board._board[0, 3] == Cell.Empty) &//нужные поля свободны
+                    (!CheckCheck(kingXY, board, color, enemyFigures)) &//король не попадает под шах нигде на протяжении рокировки
+                    (!CheckCheck(new XY(0, 2), board, color, enemyFigures)) &
+                    (!CheckCheck(new XY(0, 3), board, color, enemyFigures)))
+                {
+                    Move = new Move(kingXY, 0, 2);
+                    Move._moveType = MoveType.BlackLeftRogue;//Для Board.DoMove чтоб знать какие фигуры двигать
 
                     if (Count > 0)
                     {
@@ -2266,18 +2514,15 @@ namespace ChessFantasy
                     }
                 }
 
-                //ход черного короля вверх-влево
-                if ((kingXY.r - 1 > 0) & (kingXY.c - 1 > 0) &
-                    ((board._board[kingXY.r - 1, kingXY.c - 1] == Cell.WhitePawn) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.WhiteKnight) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.WhiteBishop) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.WhiteRook) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.WhiteQueen) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.WhiteKing) |
-                    (board._board[kingXY.r - 1, kingXY.c - 1] == Cell.Empty)))
+                //ход черного короля: правая рокировка
+                if ((board._BRRogueAvailable) & (board._board[0, 5] == Cell.Empty) &//рокировка доступна
+                    (board._board[0, 6] == Cell.Empty) &//нужные поля свободны
+                    (!CheckCheck(kingXY, board, color, enemyFigures)) &//король не попадает под шах нигде на протяжении рокировки
+                    (!CheckCheck(new XY(0, 5), board, color, enemyFigures)) &
+                    (!CheckCheck(new XY(0, 6), board, color, enemyFigures)))
                 {
-                    Move = new Move(kingXY, kingXY.r - 1, kingXY.c - 1);
-                    if (board._board[kingXY.r - 1, kingXY.c - 1] != Cell.Empty) { Move._moveType = MoveType.Taking; }
+                    Move = new Move(kingXY, 7, 6);
+                    Move._moveType = MoveType.BlackRightRogue;//Для Board.DoMove чтоб знать какие фигуры двигать
 
                     if (Count > 0)
                     {
