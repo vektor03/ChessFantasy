@@ -117,7 +117,8 @@ namespace ChessFantasy
 
                 if (move != null)//пользователь нажал на доступный ход
                 {
-                    if (move._moveType == MoveType.Taking)//Если в ходе хода кого-то съели нужно удалить фигуру из массива
+                    if (move._moveType == MoveType.Taking)//если это был ход взятия 
+                        //и в ходе хода кого-то съели нужно удалить фигуру из массива
                     {
                         if (_MainBoard.NextColor == Color.White)//из какого массива удалять съеденую фигуру
                         {
@@ -149,9 +150,72 @@ namespace ChessFantasy
                                 j++;
                             }
                         }
+
+                        //также нужно поменять координаты фигуры которая ходила
+                        if (_MainBoard.NextColor == Color.White)//в каком массиве нужно изменить координаты
+                        {
+                            int count = _WhiteFigures.Figures.Length;
+
+                            for (int i = 0; i < count; i++)
+                            {
+                                if ((_WhiteFigures.Figures[i].r == move.XY1.r) && (_WhiteFigures.Figures[i].c == move.XY1.c))
+                                {
+                                    _WhiteFigures.Figures[i].r = move.XY2.r;
+                                    _WhiteFigures.Figures[i].c = move.XY2.c;
+                                    break;
+                                }
+                            }
+                        }
+                        else//если мы ходим черной фигурой
+                        {
+                            int count = _BlackFigures.Figures.Length;
+
+                            for (int i = 1; i < count; i++)
+                            {
+                                if ((_BlackFigures.Figures[i].r == move.XY1.r) && (_BlackFigures.Figures[i].c == move.XY1.c))
+                                {
+                                    _BlackFigures.Figures[i].r = move.XY2.r;
+                                    _BlackFigures.Figures[i].c = move.XY2.c;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (move._moveType == MoveType.Moving)//если это был ход перемещения
+                        //и нужно изменить координаты фигуры в массиве фигур
+                    {
+                        if (_MainBoard.NextColor == Color.White)//в каком массиве нужно изменить координаты
+                        {
+                            int count = _WhiteFigures.Figures.Length;
+
+                            for (int i = 0; i < count; i++)
+                            {
+                                if ((_WhiteFigures.Figures[i].r == move.XY1.r) && (_WhiteFigures.Figures[i].c == move.XY1.c))
+                                {
+                                    _WhiteFigures.Figures[i].r = move.XY2.r;
+                                    _WhiteFigures.Figures[i].c = move.XY2.c;
+                                    break;
+                                }
+                            }
+                        }
+                        else//если мы ходим черной фигурой
+                        {
+                            int count = _BlackFigures.Figures.Length;
+
+                            for (int i = 1; i < count; i++)
+                            {
+                                if ((_BlackFigures.Figures[i].r == move.XY1.r) && (_BlackFigures.Figures[i].c == move.XY1.c))
+                                {
+                                    _BlackFigures.Figures[i].r = move.XY2.r;
+                                    _BlackFigures.Figures[i].c = move.XY2.c;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
-                    Board.DoMove(_MainBoard, move, _MainBoard.NextColor);//делаем ход
+
+                    _MainBoard = Board.DoMove(_MainBoard, move, _MainBoard.NextColor);//делаем ход
                     _LastMove = move;//записываем как последний ход
                     VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
                 }
