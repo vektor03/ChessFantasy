@@ -1,5 +1,4 @@
 D:\VICTOR\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.csprojAssemblyReference.cache
-D:\VICTOR\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.Form1.resources
 D:\VICTOR\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.Properties.Resources.resources
 D:\VICTOR\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.csproj.GenerateResource.cache
 D:\VICTOR\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.csproj.CoreCompileInputs.cache

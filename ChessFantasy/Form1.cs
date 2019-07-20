@@ -80,7 +80,7 @@ namespace ChessFantasy
                         VisualBoard.DrawVisualBoardAvailable(this, _MainBoard, _AvailableMoves, FigureXY);//нарисуем доступные ходы
                     }
                 }
-                else
+                else//Если ходит черный игрок
                 {
                     if ((Chosen == Cell.BlackPawn) | (Chosen == Cell.BlackKnight) |//если мы выбрали свою фигуру
                          (Chosen == Cell.BlackBishop) | (Chosen == Cell.BlackRook) |
@@ -104,20 +104,52 @@ namespace ChessFantasy
             else//игрок уже активировал фигуру
             {
                 int CountFound = _AvailableMoves.Length;// количество доступных ходов
-                bool flagMatch = false;//нашелся ход
+                Move move = null;
 
                 for (int i = 0; i < CountFound; i++)
                 {
                     if ((FigureXY.r == _AvailableMoves[i].XY2.r) && (FigureXY.c == _AvailableMoves[i].XY2.c))
                     {
-                        flagMatch = true;//нашелся ход
+                        move = _AvailableMoves[i];
                         break;
                     }
                 }
 
-                if (flagMatch)//пользователь нажал на доступный ход
+                if (move != null)//пользователь нажал на доступный ход
                 {
-                    Move move = new Move(_MovingFigureXY, FigureXY);
+                    if (move._moveType == MoveType.Taking)//Если в ходе хода кого-то съели нужно удалить фигуру из массива
+                    {
+                        if (_MainBoard.NextColor == Color.White)//из какого массива удалять съеденую фигуру
+                        {
+                            int count = _BlackFigures.Figures.Length;
+                            XY[] FiguresCuted = new XY[count - 1];
+
+                            int j = 0;
+                            for (int i = 1; i < count; i++ )
+                            {
+                                if ((_BlackFigures.Figures[i].r == move.XY2.r) && (_BlackFigures.Figures[i].c == move.XY2.c))
+                                { continue; }
+
+                                FiguresCuted[j] = _BlackFigures.Figures[i];
+                                j++;
+                            }
+                        }
+                        else//если мы черными съели белую фигуру
+                        {
+                            int count = _WhiteFigures.Figures.Length;
+                            XY[] FiguresCuted = new XY[count - 1];
+
+                            int j = 0;
+                            for (int i = 1; i < count; i++)
+                            {
+                                if ((_WhiteFigures.Figures[i].r == move.XY2.r) && (_WhiteFigures.Figures[i].c == move.XY2.c))
+                                { continue; }
+
+                                FiguresCuted[j] = _WhiteFigures.Figures[i];
+                                j++;
+                            }
+                        }
+                    }
 
                     Board.DoMove(_MainBoard, move, _MainBoard.NextColor);//делаем ход
                     _LastMove = move;//записываем как последний ход
