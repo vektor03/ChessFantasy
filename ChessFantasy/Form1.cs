@@ -14,9 +14,7 @@ namespace ChessFantasy
     {
         static Board _MainBoard = new Board();//главная доска на которой будет проходить игра
         bool _activatedFigure = false;//игрок тронул фигуру?
-        FiguresXY _WhiteFigures;//массив координат всех белых фигур, в том числе короля
-        FiguresXY _BlackFigures;//массив координат всех черных фигур, в том числе короля
-        Move _LastMove;//последний ход для эмпасана
+        
         Move[] _AvailableMoves = new Move[0];
         XY _MovingFigureXY;
 
@@ -24,10 +22,6 @@ namespace ChessFantasy
         {
             InitializeComponent();
             VisualBoard.DrawVisualBoard(this, _MainBoard);
-
-            //нужно в конструктор добавить инициализацию массивов фигур
-            _BlackFigures = new FiguresXY(Color.Black);//добавить все черные фигуры
-            _WhiteFigures = new FiguresXY(Color.White);//добавить все белые фигуры
         }
 
         public void Draw(Bitmap Bmp)
@@ -67,9 +61,9 @@ namespace ChessFantasy
                          (Chosen == Cell.WhiteBishop) | (Chosen == Cell.WhiteRook) |
                          (Chosen == Cell.WhiteQueen) | (Chosen == Cell.WhiteKing))
                     {
-                        XY kingXY = _WhiteFigures.King;
-                        FiguresXY enemyFigures = _BlackFigures;
-                        Move enemyLastMove = _LastMove;
+                        XY kingXY = _MainBoard.WhiteFigures.King;
+                        FiguresXY enemyFigures = _MainBoard.BlackFigures;
+                        Move enemyLastMove = _MainBoard.LastMove;
 
                         //найдем все ходы тронутой фигуры:
                         Moves = Board.FindCellMoves(FigureXY, _MainBoard, _MainBoard.NextColor, kingXY, enemyFigures, enemyLastMove);
@@ -86,9 +80,9 @@ namespace ChessFantasy
                          (Chosen == Cell.BlackBishop) | (Chosen == Cell.BlackRook) |
                          (Chosen == Cell.BlackQueen) | (Chosen == Cell.BlackKing))
                     {
-                        XY kingXY = _BlackFigures.King;
-                        FiguresXY enemyFigures = _WhiteFigures;
-                        Move enemyLastMove = _LastMove;
+                        XY kingXY = _MainBoard.BlackFigures.King;
+                        FiguresXY enemyFigures = _MainBoard.WhiteFigures;
+                        Move enemyLastMove = _MainBoard.LastMove;
 
                         //найдем все ходы тронутой фигуры:
                         Moves = Board.FindCellMoves(FigureXY, _MainBoard, _MainBoard.NextColor, kingXY, enemyFigures, enemyLastMove);
@@ -122,31 +116,31 @@ namespace ChessFantasy
                     {
                         if (_MainBoard.NextColor == Color.White)//из какого массива удалять съеденую фигуру
                         {
-                            int count = _BlackFigures.Figures.Length;
+                            int count = _MainBoard.BlackFigures.Figures.Length;
                             XY[] FiguresCuted = new XY[count - 1];
 
                             int j = 0;
                             for (int i = 1; i < count; i++ )
                             {
-                                if ((_BlackFigures.Figures[i].r == move.XY2.r) && (_BlackFigures.Figures[i].c == move.XY2.c))
+                                if ((_MainBoard.BlackFigures.Figures[i].r == move.XY2.r) && (_MainBoard.BlackFigures.Figures[i].c == move.XY2.c))
                                 { continue; }
 
-                                FiguresCuted[j] = _BlackFigures.Figures[i];
+                                FiguresCuted[j] = _MainBoard.BlackFigures.Figures[i];
                                 j++;
                             }
                         }
                         else//если мы черными съели белую фигуру
                         {
-                            int count = _WhiteFigures.Figures.Length;
+                            int count = _MainBoard.WhiteFigures.Figures.Length;
                             XY[] FiguresCuted = new XY[count - 1];
 
                             int j = 0;
                             for (int i = 1; i < count; i++)
                             {
-                                if ((_WhiteFigures.Figures[i].r == move.XY2.r) && (_WhiteFigures.Figures[i].c == move.XY2.c))
+                                if ((_MainBoard.WhiteFigures.Figures[i].r == move.XY2.r) && (_MainBoard.WhiteFigures.Figures[i].c == move.XY2.c))
                                 { continue; }
 
-                                FiguresCuted[j] = _WhiteFigures.Figures[i];
+                                FiguresCuted[j] = _MainBoard.WhiteFigures.Figures[i];
                                 j++;
                             }
                         }
@@ -154,28 +148,28 @@ namespace ChessFantasy
                         //также нужно поменять координаты фигуры которая ходила
                         if (_MainBoard.NextColor == Color.White)//в каком массиве нужно изменить координаты
                         {
-                            int count = _WhiteFigures.Figures.Length;
+                            int count = _MainBoard.WhiteFigures.Figures.Length;
 
                             for (int i = 0; i < count; i++)
                             {
-                                if ((_WhiteFigures.Figures[i].r == move.XY1.r) && (_WhiteFigures.Figures[i].c == move.XY1.c))
+                                if ((_MainBoard.WhiteFigures.Figures[i].r == move.XY1.r) && (_MainBoard.WhiteFigures.Figures[i].c == move.XY1.c))
                                 {
-                                    _WhiteFigures.Figures[i].r = move.XY2.r;
-                                    _WhiteFigures.Figures[i].c = move.XY2.c;
+                                    _MainBoard.WhiteFigures.Figures[i].r = move.XY2.r;
+                                    _MainBoard.WhiteFigures.Figures[i].c = move.XY2.c;
                                     break;
                                 }
                             }
                         }
                         else//если мы ходим черной фигурой
                         {
-                            int count = _BlackFigures.Figures.Length;
+                            int count = _MainBoard.BlackFigures.Figures.Length;
 
                             for (int i = 1; i < count; i++)
                             {
-                                if ((_BlackFigures.Figures[i].r == move.XY1.r) && (_BlackFigures.Figures[i].c == move.XY1.c))
+                                if ((_MainBoard.BlackFigures.Figures[i].r == move.XY1.r) && (_MainBoard.BlackFigures.Figures[i].c == move.XY1.c))
                                 {
-                                    _BlackFigures.Figures[i].r = move.XY2.r;
-                                    _BlackFigures.Figures[i].c = move.XY2.c;
+                                    _MainBoard.BlackFigures.Figures[i].r = move.XY2.r;
+                                    _MainBoard.BlackFigures.Figures[i].c = move.XY2.c;
                                     break;
                                 }
                             }
@@ -186,28 +180,28 @@ namespace ChessFantasy
                     {
                         if (_MainBoard.NextColor == Color.White)//в каком массиве нужно изменить координаты
                         {
-                            int count = _WhiteFigures.Figures.Length;
+                            int count = _MainBoard.WhiteFigures.Figures.Length;
 
                             for (int i = 0; i < count; i++)
                             {
-                                if ((_WhiteFigures.Figures[i].r == move.XY1.r) && (_WhiteFigures.Figures[i].c == move.XY1.c))
+                                if ((_MainBoard.WhiteFigures.Figures[i].r == move.XY1.r) && (_MainBoard.WhiteFigures.Figures[i].c == move.XY1.c))
                                 {
-                                    _WhiteFigures.Figures[i].r = move.XY2.r;
-                                    _WhiteFigures.Figures[i].c = move.XY2.c;
+                                    _MainBoard.WhiteFigures.Figures[i].r = move.XY2.r;
+                                    _MainBoard.WhiteFigures.Figures[i].c = move.XY2.c;
                                     break;
                                 }
                             }
                         }
                         else//если мы ходим черной фигурой
                         {
-                            int count = _BlackFigures.Figures.Length;
+                            int count = _MainBoard.BlackFigures.Figures.Length;
 
                             for (int i = 1; i < count; i++)
                             {
-                                if ((_BlackFigures.Figures[i].r == move.XY1.r) && (_BlackFigures.Figures[i].c == move.XY1.c))
+                                if ((_MainBoard.BlackFigures.Figures[i].r == move.XY1.r) && (_MainBoard.BlackFigures.Figures[i].c == move.XY1.c))
                                 {
-                                    _BlackFigures.Figures[i].r = move.XY2.r;
-                                    _BlackFigures.Figures[i].c = move.XY2.c;
+                                    _MainBoard.BlackFigures.Figures[i].r = move.XY2.r;
+                                    _MainBoard.BlackFigures.Figures[i].c = move.XY2.c;
                                     break;
                                 }
                             }
@@ -216,7 +210,7 @@ namespace ChessFantasy
 
 
                     _MainBoard = Board.DoMove(_MainBoard, move, _MainBoard.NextColor);//делаем ход
-                    _LastMove = move;//записываем как последний ход
+                    
                     VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
                 }
                 else

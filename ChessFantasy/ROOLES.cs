@@ -40,11 +40,12 @@ namespace ChessFantasy
 
     public class Board //содержит доску с фигурами и все дествия с ней, а также всю информацию для игры
     {
+        #region свойства
         //Флаги о том что белый и черный игроки двигали королей и ладьи (для рокировки)
-        public bool _WLRogueAvailable = true;//У белых есть право на длинную рокировку (левая ладья и король не делали ход)
-        public bool _WRRogueAvailable = true;//У белых есть право на короткую рокировку (правая ладья и король не делали ход)
-        public bool _BLRogueAvailable = true;//У черных есть право на длинную рокировку (левая ладья и король не делали ход)
-        public bool _BRRogueAvailable = true;//У черных есть право на короткую рокировку (правая ладья и король не делали ход)
+        private bool _WLRogueAvailable = true;//У белых есть право на длинную рокировку (левая ладья и король не делали ход)
+        private bool _WRRogueAvailable = true;//У белых есть право на короткую рокировку (правая ладья и король не делали ход)
+        private bool _BLRogueAvailable = true;//У черных есть право на длинную рокировку (левая ладья и король не делали ход)
+        private bool _BRRogueAvailable = true;//У черных есть право на короткую рокировку (правая ладья и король не делали ход)
 
         private Cell[,] _board; //Сама доска, массив 8х8 в котором записано состояние каждой клетки
         public Cell[,] BoardArr//Свойства чтобы можно было снаружи смотреть массив
@@ -52,11 +53,29 @@ namespace ChessFantasy
             get { return _board; }
         }
 
-        private Color _nextColor; //Цвет игрока, который ходит следующим
+        private Color _nextColor = Color.White; //Цвет игрока, который ходит следующим
         public Color NextColor//Свойства чтобы можно было снаружи смотреть массив
         {
             get { return _nextColor; }
         }
+
+        private FiguresXY _WhiteFigures;//массив координат всех белых фигур, в том числе короля
+        public FiguresXY WhiteFigures//Свойства чтобы можно было снаружи смотреть массив
+        {
+            get { return _WhiteFigures; }
+        }
+        private FiguresXY _BlackFigures;//массив координат всех черных фигур, в том числе короля
+        public FiguresXY BlackFigures//Свойства чтобы можно было снаружи смотреть массив
+        {
+            get { return _BlackFigures; }
+        }
+        private Move _LastMove = null;//последний ход для эмпасана
+        public Move LastMove//Свойства чтобы можно было снаружи смотреть массив
+        {
+            get { return _LastMove; }
+            set { }
+        }
+        #endregion
 
         public Board()//создание начальной доски
             {
@@ -68,7 +87,11 @@ namespace ChessFantasy
                                          { 0,        0,       0,       0,        0,        0,       0,       0 },
                                          { (Cell)1,  (Cell)1, (Cell)1, (Cell)1,  (Cell)1,  (Cell)1, (Cell)1, (Cell)1 },
                                          { (Cell)4,  (Cell)2, (Cell)3, (Cell)5,  (Cell)6,  (Cell)3, (Cell)2, (Cell)4 } };
-            }
+
+            //нужно в конструктор добавить инициализацию массивов фигур
+            _BlackFigures = new FiguresXY(Color.Black);//добавить все черные фигуры
+            _WhiteFigures = new FiguresXY(Color.White);//добавить все белые фигуры
+        }
 
         public Board(Board a)//конструктор копирования
         {
@@ -78,7 +101,8 @@ namespace ChessFantasy
             _BRRogueAvailable = a._BRRogueAvailable;
             _nextColor = a._nextColor;
 
-            int Length = a._board.Length;
+            _LastMove =  new Move(a._LastMove);
+
             _board = new Cell[8, 8];
             for (int r = 0; r < 8; r++)
             {
@@ -87,6 +111,12 @@ namespace ChessFantasy
                     _board[r,c] = a._board[r, c];
                 }
             }
+
+            //Поэлементное копирование массива белых фигур
+            this._WhiteFigures = new FiguresXY(a._WhiteFigures); ;
+
+            //Поэлементное копирование массива черных фигур
+            this._BlackFigures = new FiguresXY(a._BlackFigures); ;
         }
 
         /// <summary>
@@ -176,6 +206,8 @@ namespace ChessFantasy
                 {
                     boardOut._nextColor = Color.White;
                 }
+
+                boardOut.LastMove = move;//записываем как последний ход
 
                 return boardOut;
             }
@@ -3330,14 +3362,16 @@ namespace ChessFantasy
 
     public class Move //содержит координаты начала и конца хода
     {
-        private XY[] _move;//массив в котором лежат координаты начала и конца хода
+        private XY[] _move = null;//массив в котором лежат координаты начала и конца хода
         public XY XY1//Свойства чтобы можно было смотреть позиции начала и конца хода
         {
             get { return _move[0]; }
+            set { }
         }
         public XY XY2
         {
             get { return _move[1]; }
+            set { }
         }
 
         public MoveType _moveType = MoveType.Moving;//тип хода
@@ -3345,18 +3379,23 @@ namespace ChessFantasy
         public Move(XY xy1, int x2, int y2, MoveType type = MoveType.Moving)//конструктор из координат хода
         {
             XY xy2 = new XY(x2, y2);
-            _move = new XY[2] { xy1, xy2 };
-            _moveType = type;
+            this._move = new XY[2] { xy1, xy2 };
+            this._moveType = type;
         }
 
-        public Move(XY xy1, XY xy2)//конструктор из координат XY
+        public Move(XY xy1, XY xy2, MoveType type = MoveType.Moving)//конструктор из координат XY
         {
-            _move = new XY[2] { xy1, xy2 };
+            this._move = new XY[2] { xy1, xy2 };
+            this._moveType = type;
         }
 
         public Move(Move a)//конструктор копирования
         {
-            _move = a._move;
+            if ((a != null) && (a._move !=  null))
+            {
+                this._move = new XY[] { a._move[0], a._move[1] };
+                this._moveType = a._moveType;
+            }
         }
     }
 
@@ -3366,11 +3405,13 @@ namespace ChessFantasy
         public XY[] Figures//Свойство чтобы можно было использовать массив в циклах
         {
             get { return _figures; }
+            set { }
         }
         private XY _king;//координаты короля
         public XY King//Свойство чтобы можно было использовать массив в циклах
         {
             get { return _king; }
+            set { }
         }
 
         public FiguresXY(XY[] figures, XY king)//конструктор из массива
@@ -3381,8 +3422,13 @@ namespace ChessFantasy
 
         public FiguresXY(FiguresXY a)//конструктор копирования
         {
-            _figures = a._figures;
-            _king = a._king;
+            int Length = a._figures.Length;
+            this._figures = new XY[Length];
+            for (int i = 0; i < Length; i++)
+            {
+                this._figures[i] = a._figures[i];
+            }
+            this._king = a._king;
         }
 
         public FiguresXY(Color color)//конструктор для начальной позиции шахмат
@@ -3423,3 +3469,6 @@ namespace ChessFantasy
         }
     }
 }
+
+
+
