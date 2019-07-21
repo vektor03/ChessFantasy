@@ -135,7 +135,7 @@ namespace ChessFantasy
                 boardOut._board[move.XY1.r, move.XY1.c] = Cell.Empty;//клетка с которой начинался ход обнуляется
                 boardOut._board[move.XY2.r, move.XY2.c] = Figure;//клетка, где заканчивается ход, занимается фигурой
                 
-
+                 
                     if (color == Color.White)//Если это какой-то экзотический ход типа взятия на проходе или рокировки, то нужно знать цвет фигуры
                 {
                     boardOut.WhiteFigures.RewriteXY(move.XY1, move.XY2);//меняем координаты в массиве
@@ -224,8 +224,8 @@ namespace ChessFantasy
                     }
                     else if (move._moveType == MoveType.BlackRightRogue)//рокировка черного короля вправо
                     {
-                        boardOut._board[0, 0] = Cell.Empty;//клетка на которой стояла ладья обнуляется
-                        boardOut._board[0, 3] = Cell.BlackRook;//ладья переставляется
+                        boardOut._board[0, 7] = Cell.Empty;//клетка на которой стояла ладья обнуляется
+                        boardOut._board[0, 5] = Cell.BlackRook;//ладья переставляется
                         XY Old = new XY(0, 7);
                         XY New = new XY(0, 5);
                         boardOut.BlackFigures.RewriteXY(Old, New);//удаляем съеденную фигуру
@@ -2236,6 +2236,7 @@ namespace ChessFantasy
                 rMove = kingXY.r + 1;
                 cMove = kingXY.c;
 
+
                 if ((rMove < 8) &&
                     ((board._board[rMove, cMove] == Cell.BlackPawn) ||
                     (board._board[rMove, cMove] == Cell.BlackKnight) ||
@@ -2900,7 +2901,7 @@ namespace ChessFantasy
                     (!CheckCheck(board, color, enemyFigures, new XY(0, 5))) &&
                     (!CheckCheck(board, color, enemyFigures, new XY(0, 6))))
                 {
-                    Move = new Move(kingXY, 7, 6);
+                    Move = new Move(kingXY, 0, 6);
                     Move._moveType = MoveType.BlackRightRogue;//Для Board.DoMove чтоб знать какие фигуры двигать
 
                     if (Count > 0)
@@ -3517,7 +3518,7 @@ namespace ChessFantasy
             this._figures = new XY[Length];
             for (int i = 0; i < Length; i++)
             {
-                this._figures[i] = a._figures[i];
+                this._figures[i] = new XY(a._figures[i]);
             }
             this._king = a._king;
         }
@@ -3533,7 +3534,7 @@ namespace ChessFantasy
                 if ((this.Figures[i].r == deleteXY.r) && (this.Figures[i].c == deleteXY.c))
                 { continue; }
 
-                FiguresCuted[j] = this.Figures[i];
+                FiguresCuted[j] = new XY(this.Figures[i]);
                 j++;
             }
             this.Figures = FiguresCuted;
@@ -3543,7 +3544,7 @@ namespace ChessFantasy
         {
             int count = this.Figures.Length;
 
-            for (int i = 1; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 if ((this.Figures[i].r == oldXY.r) && (this.Figures[i].c == oldXY.c))
                 {
