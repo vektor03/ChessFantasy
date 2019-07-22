@@ -183,6 +183,12 @@ namespace ChessFantasy
                         XY New = new XY(7, 5);
                         boardOut.WhiteFigures.RewriteXY(Old, New);//удаляем съеденную фигуру
                     }
+                    
+                    //если пешко дошла до конца
+                    if ((move.XY2.r == 0) && (boardOut._board[move.XY2.r, move.XY2.c] == Cell.WhitePawn))
+                    {
+                        boardOut._board[move.XY2.r, move.XY2.c] = Cell.WhiteQueen;//дать ферзя
+                    }
                 }
                 else //Ходим черными фигурами рокировку и взятие на проходе
                 {
@@ -229,6 +235,12 @@ namespace ChessFantasy
                         XY Old = new XY(0, 7);
                         XY New = new XY(0, 5);
                         boardOut.BlackFigures.RewriteXY(Old, New);//удаляем съеденную фигуру
+                    }
+
+                    //если пешко дошла до конца
+                    if ((move.XY2.r == 7) && (boardOut._board[move.XY2.r, move.XY2.c] == Cell.BlackPawn))
+                    {
+                        boardOut._board[move.XY2.r, move.XY2.c] = Cell.BlackQueen;//дать ферзя
                     }
                 }
 

@@ -11,7 +11,6 @@ C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\bin\Debug\ChessFantasy.exe.config
 C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\bin\Debug\ChessFantasy.exe
 C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\bin\Debug\ChessFantasy.pdb
 C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.csprojAssemblyReference.cache
-C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.Form1.resources
 C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.Properties.Resources.resources
 C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.csproj.GenerateResource.cache
 C:\VIKTOR\2079\07.19\ChessFantasy\ChessFantasy\obj\Debug\ChessFantasy.csproj.CoreCompileInputs.cache
