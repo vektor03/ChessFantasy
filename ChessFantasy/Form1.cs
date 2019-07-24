@@ -112,6 +112,16 @@ namespace ChessFantasy
                 if (move != null)//пользователь нажал на доступный ход
                 {
                     _MainBoard = Board.DoMove(_MainBoard, move, _MainBoard.NextColor);//делаем ход
+
+                    bool CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
+                    if (CheckCheck)
+                    {
+                        bool CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
+                        if (CheckMate)
+                        {
+                            VisualBoard.CheckMate(_MainBoard.NextColor);
+                        }
+                    }
                     
                     VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
                 }

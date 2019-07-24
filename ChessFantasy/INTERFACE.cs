@@ -208,5 +208,20 @@ namespace ChessFantasy
 
             DrawElement(CellImage, x, y);//нарисовать клетку
         }
+
+        /// <summary>
+        /// Рисует объявление победителя
+        /// </summary>
+        public static void CheckMate(Color color)
+        {
+            if (color == Color.White)//проиграл белый игрок
+            {
+                WhiteCell = Image.FromFile("Resources\\BlackCell.png");
+            }
+            else//проиграл черный игрок
+            {
+                BlackCell = Image.FromFile("Resources\\WhiteCell.png");
+            }
+        }
     }
 }
