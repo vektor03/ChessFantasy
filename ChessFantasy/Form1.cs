@@ -122,13 +122,10 @@ namespace ChessFantasy
                             VisualBoard.CheckMate(_MainBoard.NextColor);
                         }
                     }
-                    
-                    VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
                 }
-                else
-                {
-                    VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
-                }
+
+                VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
+
                 _activatedFigure = false;//сбрасываем тронутую фигуру
                 _AvailableMoves = new Move[0];
             }

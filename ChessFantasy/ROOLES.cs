@@ -150,10 +150,14 @@ namespace ChessFantasy
                         boardOut._WRRogueAvailable = false;
                         boardOut._WhiteFigures.King = move.XY2;
                     }
-                    else if ((Figure == Cell.WhiteRook) && (move.XY1.r == 7) && (move.XY1.c == 0))
+                    else if ((Figure == Cell.WhiteRook) && (move.XY1.r == 7) && (move.XY1.c == 0))//если игрок ходит ладьей
                         { boardOut._WLRogueAvailable = false; }
-                    else if((Figure == Cell.WhiteRook) && (move.XY1.r == 7) && (move.XY1.c == 7))
-                        { boardOut._WRRogueAvailable = false; }
+                    else if((Figure == Cell.WhiteRook) && (move.XY1.r == 7) && (move.XY1.c == 7))//если игрок ходит ладьей
+                    { boardOut._WRRogueAvailable = false; }
+                    else if ((move.XY2.r == 0) && (move.XY2.c == 0))//если черную ладью съели
+                    { boardOut._BLRogueAvailable = false; }
+                    else if ((move.XY2.r == 0) && (move.XY2.c == 7))//если черную ладью съели
+                    { boardOut._BRRogueAvailable = false; }
 
                     if (move._moveType == MoveType.WhiteLeftEmpassant)//взятие на проходе белой пешкой влево
                     {
@@ -207,6 +211,10 @@ namespace ChessFantasy
                     { boardOut._BLRogueAvailable = false; }
                     else if ((Figure == Cell.BlackRook) && (move.XY1.r == 0) && (move.XY1.c == 7))
                     { boardOut._BRRogueAvailable = false; }
+                    else if ((move.XY2.r == 7) && (move.XY2.c == 0))//если белую ладью съели
+                    { boardOut._WLRogueAvailable = false; }
+                    else if ((move.XY2.r == 7) && (move.XY2.c == 7))//если белую ладью съели
+                    { boardOut._WRRogueAvailable = false; }
 
                     if (move._moveType == MoveType.BlackLeftEmpassant)//взятие на проходе черной пешкой влево
                     {
@@ -1320,7 +1328,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
                     
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1329,6 +1336,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r - j;
                     cMove = bishopXY.c + j;
@@ -1371,7 +1380,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1380,6 +1388,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r + j;
                     cMove = bishopXY.c + j;
@@ -1421,7 +1431,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1430,6 +1439,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r + j;
                     cMove = bishopXY.c - j;
@@ -1471,7 +1482,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1480,6 +1490,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r - j;
                     cMove = bishopXY.c - j;
@@ -1524,7 +1536,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1533,6 +1544,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r - j;
                     cMove = bishopXY.c + j;
@@ -1574,7 +1587,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1583,6 +1595,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r + j;
                     cMove = bishopXY.c + j;
@@ -1624,7 +1638,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1633,6 +1646,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r + j;
                     cMove = bishopXY.c - j;
@@ -1674,7 +1689,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1683,6 +1697,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = bishopXY.r - j;
                     cMove = bishopXY.c - j;
@@ -1747,8 +1763,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1757,6 +1771,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r;
                     cMove = rookXY.c + j;
@@ -1800,8 +1816,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1810,6 +1824,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r + j;
                     cMove = rookXY.c;
@@ -1853,8 +1869,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1863,6 +1877,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r;
                     cMove = rookXY.c - j;
@@ -1905,8 +1921,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1915,6 +1929,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r - j;
                     cMove = rookXY.c;
@@ -1960,8 +1976,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -1970,6 +1984,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r;
                     cMove = rookXY.c + j;
@@ -2011,17 +2027,17 @@ namespace ChessFantasy
                         {
                             Moves = new Move[] { Move };
                             Count = 1;
-                        }
-
-                        j++;
+                        }  
                     }
-
+                    
                     //если мы наткнулись на противника то больше ходить нельзя
                     if (board._board[rMove, cMove] != Cell.Empty)
                     {
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r + j;
                     cMove = rookXY.c;
@@ -2064,8 +2080,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -2074,6 +2088,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r;
                     cMove = rookXY.c - j;
@@ -2116,8 +2132,6 @@ namespace ChessFantasy
                             Moves = new Move[] { Move };
                             Count = 1;
                         }
-
-                        j++;
                     }
 
                     //если мы наткнулись на противника то больше ходить нельзя
@@ -2126,6 +2140,8 @@ namespace ChessFantasy
                         Move._moveType = MoveType.Taking;
                         break;
                     }
+
+                    j++;
 
                     rMove = rookXY.r - j;
                     cMove = rookXY.c;
@@ -3378,13 +3394,13 @@ namespace ChessFantasy
                             return false;
                     }
                 }
-
-                if (FoundMoves != null)//нужно узнать, сужествует ли хоть один ход, доступный фигуре игрока
+                if (FoundMoves.Length != 0)//сужествует хоть один ход, доступный фигуре игрока
                 {
-                    return true;
+                    return false;
                 }
             }
-            return false;//обойдя все фигуры не нашлось фигуры у которой был бы возможный ход
+
+            return true;//обойдя все фигуры не нашлось фигуры у которой был бы возможный ход
         }
 
         /// <summary>
@@ -3535,7 +3551,7 @@ namespace ChessFantasy
         public XY[] Figures//Свойство чтобы можно было использовать массив в циклах
         {
             get { return _figures; }
-            set { }
+            set { _figures = value; }
         }
         private XY _king;//координаты короля
         public XY King//Свойство чтобы можно было использовать массив в циклах
@@ -3567,7 +3583,7 @@ namespace ChessFantasy
             XY[] FiguresCuted = new XY[count - 1];
 
             int j = 0;
-            for (int i = 1; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 if ((this.Figures[i].r == deleteXY.r) && (this.Figures[i].c == deleteXY.c))
                 { continue; }

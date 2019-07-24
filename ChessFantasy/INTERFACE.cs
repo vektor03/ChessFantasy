@@ -216,11 +216,11 @@ namespace ChessFantasy
         {
             if (color == Color.White)//проиграл белый игрок
             {
-                WhiteCell = Image.FromFile("Resources\\BlackCell.png");
+                WhiteCell = BlackCell;
             }
             else//проиграл черный игрок
             {
-                BlackCell = Image.FromFile("Resources\\WhiteCell.png");
+                BlackCell = WhiteCell;
             }
         }
     }
