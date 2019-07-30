@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-//TODO: Сделать все условия при поиске всех ходов через else if
 namespace ChessFantasy
 {
+    #region перечисления
     public enum Cell
     {
         Empty = 0,
@@ -37,6 +37,7 @@ namespace ChessFantasy
         BlackLeftRogue = 8,//Белый король делает левую рокировку
         BlackRightRogue = 9//Белый король делает правую рокировку
     }
+    #endregion
 
     public class Board //содержит доску с фигурами и все дествия с ней, а также всю информацию для игры
     {
@@ -77,7 +78,10 @@ namespace ChessFantasy
         }
         #endregion
 
-        public Board()//создание начальной доски
+        /// <summary>
+        ///создание начальной доски
+        /// </summary>
+        public Board()
             {
                 _board = new Cell[8, 8] {{ (Cell)10, (Cell)8, (Cell)9, (Cell)11, (Cell)12, (Cell)9, (Cell)8, (Cell)10 },
                                          { (Cell)7,  (Cell)7, (Cell)7, (Cell)7,  (Cell)7,  (Cell)7, (Cell)7, (Cell)7 },
@@ -93,7 +97,10 @@ namespace ChessFantasy
             _WhiteFigures = new FiguresXY(Color.White);//добавить все белые фигуры
         }
 
-        public Board(Board a)//конструктор копирования
+        /// <summary>
+        ///конструктор копирования
+        /// </summary>
+        public Board(Board a)
         {
             _WLRogueAvailable = a._WLRogueAvailable;
             _WRRogueAvailable = a._WRRogueAvailable;
@@ -121,10 +128,10 @@ namespace ChessFantasy
 
         /// <summary>
         /// Возвращает доску с примененным ходом без проверки на правила
-        /// TODO: ход с превращением пешки в ферзя
         /// </summary>
-        public static Board DoMove(Board board, Move move, Color color)
+        public static Board DoMove(Board board, Move move)
         {
+            Color color = board._nextColor;
             //если координаты хода находятся на доске
             if ((move.XY1.r > -1) && (move.XY1.r < 8) && (move.XY1.c > -1) && (move.XY1.c < 8) &&
                 (move.XY2.r > -1) && (move.XY2.r < 8) && (move.XY2.c > -1) && (move.XY2.c < 8))
@@ -296,7 +303,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -312,7 +319,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, pawnXY.r - 2, pawnXY.c);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -344,7 +351,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, rMove, cMove, MoveType.Taking);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -381,7 +388,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, rMove, cMove, MoveType.Taking);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -414,7 +421,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, pawnXY.r - 1, pawnXY.c - 1, MoveType.WhiteLeftEmpassant);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -447,7 +454,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, pawnXY.r - 1, pawnXY.c + 1, MoveType.WhiteRightEmpassant);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -481,7 +488,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -497,7 +504,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, pawnXY.r + 2, pawnXY.c);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -534,7 +541,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, rMove, cMove, MoveType.Taking);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -571,7 +578,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, rMove, cMove, MoveType.Taking);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -604,7 +611,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, pawnXY.r + 1, pawnXY.c - 1, MoveType.BlackLeftEmpassant);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -637,7 +644,7 @@ namespace ChessFantasy
                     Move = new Move(pawnXY, pawnXY.r + 1, pawnXY.c + 1, MoveType.BlackRightEmpassant);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -697,7 +704,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -722,7 +729,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -756,7 +763,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -795,7 +802,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -834,7 +841,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -873,7 +880,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -912,7 +919,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -951,7 +958,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -992,7 +999,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1017,7 +1024,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1051,7 +1058,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1090,7 +1097,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1129,7 +1136,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1168,7 +1175,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1207,7 +1214,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1246,7 +1253,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1308,7 +1315,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1360,7 +1367,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1411,7 +1418,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1462,7 +1469,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1516,7 +1523,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1567,7 +1574,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1618,7 +1625,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck( TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1669,7 +1676,7 @@ namespace ChessFantasy
                     Move = new Move(bishopXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1743,7 +1750,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1796,7 +1803,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1849,7 +1856,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1901,7 +1908,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -1956,7 +1963,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2008,7 +2015,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2060,7 +2067,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2112,7 +2119,7 @@ namespace ChessFantasy
                     Move = new Move(rookXY, rMove, cMove);
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck( TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2251,7 +2258,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2278,7 +2285,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck( TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2313,7 +2320,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2353,7 +2360,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2393,7 +2400,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2433,7 +2440,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2473,7 +2480,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2513,7 +2520,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2610,7 +2617,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2636,7 +2643,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2671,7 +2678,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2711,7 +2718,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck( TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2751,7 +2758,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2791,7 +2798,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2831,7 +2838,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2871,7 +2878,7 @@ namespace ChessFantasy
                     if (board._board[rMove, cMove] != Cell.Empty) { Move._moveType = MoveType.Taking; }
 
                     //проверка этого хода на шах королю (может этот ход открывает короля для атаки)
-                    TempBoard = Board.DoMove(board, Move, board.NextColor);//делаем ход
+                    TempBoard = Board.DoMove(board, Move);//делаем ход
                     CheckKing = CheckCheck(TempBoard, color);
                     if (!CheckKing)
                     {
@@ -2998,6 +3005,77 @@ namespace ChessFantasy
             }
 
             return Moves;
+        }
+
+        /// <summary>
+        /// Поиск всех ходов, которые может совершить игрок, который ходит следующим
+        /// </summary>
+        static public Move[] FindNextColorMoves(Board board)
+        {
+            Color color = board._nextColor;
+            XY[] OurFiguresXY;//массив наших фигур
+            FiguresXY enemyFigures;//структура для хранения всех фигур противника
+            Move enemyLastMove;
+            XY kingXY;
+
+            if (color == Color.White)
+            {
+                OurFiguresXY = board._WhiteFigures.Figures;
+                enemyFigures = board._BlackFigures;
+                enemyLastMove = board._LastMove;
+                kingXY = board._WhiteFigures.King;
+            }
+            else
+            {
+                OurFiguresXY = board._BlackFigures.Figures;
+                enemyFigures = board._WhiteFigures;
+                enemyLastMove = board._LastMove;
+                kingXY = board._BlackFigures.King;
+            }
+
+            Move[] Out = new Move[0];//массив для хранени всех ходов
+            Move[] Moves = new Move[0];//массив для хранени всех ходов данной фигуры
+
+            int Length = OurFiguresXY.Length;
+            for (int j = 0; j < Length; j++)
+            {
+                int rFig = OurFiguresXY[j].r;
+                int cFig = OurFiguresXY[j].c;
+
+                switch (board._board[rFig, cFig])//клетка с которой начинается ход
+                {
+                    case (Cell.BlackPawn):
+                    case (Cell.WhitePawn):
+                        Moves = FindPawnMoves(OurFiguresXY[j], board, color, enemyLastMove, kingXY, enemyFigures);
+                        break;
+                    case (Cell.BlackKnight):
+                    case (Cell.WhiteKnight):
+                        Moves = FindKnightMoves(OurFiguresXY[j], board, color, kingXY, enemyFigures);
+                        break;
+                    case (Cell.BlackBishop):
+                    case (Cell.WhiteBishop):
+                        Moves = FindBishopMoves(OurFiguresXY[j], board, color, kingXY, enemyFigures);
+                        break;
+                    case (Cell.BlackRook):
+                    case (Cell.WhiteRook):
+                        Moves = FindRookMoves(OurFiguresXY[j], board, color, kingXY, enemyFigures);
+                        break;
+                    case (Cell.BlackQueen):
+                    case (Cell.WhiteQueen):
+                        Moves = FindQueenMoves(OurFiguresXY[j], board, color, kingXY, enemyFigures);
+                        break;
+                    case (Cell.BlackKing):
+                    case (Cell.WhiteKing):
+                        Moves = FindKingMoves(OurFiguresXY[j], board, color, enemyFigures);
+                        break;
+                    default:
+                        return null;
+                }
+
+                Out = Move.Add(Out, Moves);
+            }
+
+            return Out;
         }
 
         #endregion
@@ -3488,6 +3566,7 @@ namespace ChessFantasy
         #endregion
     }
 
+    #region второстепенные классы
     public class XY //содержит строку и ряд клетки на доске
     {
         public int r;//row
@@ -3542,6 +3621,38 @@ namespace ChessFantasy
                 this._move = new XY[] { a._move[0], a._move[1] };
                 this._moveType = a._moveType;
             }
+        }
+
+        static public Move[] Add(Move[] a, Move b)//добавление хода в массив ходов
+        {
+            int Length = a.Length;
+            Move[] Out = new Move[Length + 1];
+
+            for (int i = 0; i < Length; i++)
+            {
+                Out[i] = a[i];
+            }
+            Out[Length] = b;
+
+            return Out;
+        }
+
+        static public Move[] Add(Move[] a, Move[] b)//добавление массива ходов в массив ходов
+        {
+            int LengthA = a.Length;
+            int LengthB = b.Length;
+            Move[] Out = new Move[LengthA + LengthB];
+
+            for (int i = 0; i < LengthA; i++)
+            {
+                Out[i] = a[i];
+            }
+            for (int i = LengthA; i < LengthA + LengthB; i++)
+            {
+                Out[i] = b[i - LengthA];
+            }
+            
+            return Out;
         }
     }
 
@@ -3646,6 +3757,7 @@ namespace ChessFantasy
             _figures = OutFigures;
         }
     }
+    #endregion
 }
 
 

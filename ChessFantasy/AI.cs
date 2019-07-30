@@ -6,16 +6,36 @@ using System.Threading.Tasks;
 
 namespace ChessFantasy
 {
+    public static class AI
+    {
+        /// <summary>
+        /// основной метод рассчета ИИ
+        /// </summary>
+        static public void Processing()
+        {
+
+        }
+
+    }
+
     public class Three //содержит дерево возможных ходов
     {
-        private Three _parent;//родительский элемент
+        #region свойства
+        static private int _maxDepth = 4;//Максимальная глубина на которую нужно считать
+        public int MaxDepth
+        {
+            get { return _maxDepth; }
+            //set { _figures = value; }
+        }
+
+        private Three _parent = null;//родительский элемент
         public Three Parent
         {
             get { return _parent; }
             //set { _figures = value; }
         }
 
-        private Three[] _children;//дочерние элементы
+        private Three[] _children = new Three[0];//дочерние элементы
         public Three[] Children
         {
             get { return _children; }
@@ -36,104 +56,94 @@ namespace ChessFantasy
             //set { _figures = value; }
         }
 
-        private int _value;//оценка состояния доски
-        public int Value
+        private int _valueMax = -1000;//максимальное значение состояния доски в конце рассчета на которое можно рассчитывать
+        public int ValueMax
         {
-            get { return _value; }
+            get { return _valueMax; }
             //set { _figures = value; }
         }
 
-        /*
-        public FiguresXY(XY[] figures, XY king)//конструктор из массива
+        private int _valueMin = 1000;//минимальное значение состояния доски в конце рассчета на которое можно рассчитывать
+        public int ValueMin
         {
-            _figures = figures;
-            _king = king;
-        }*/
+            get { return _valueMin; }
+            //set { _figures = value; }
+        }
 
-        public FiguresXY(FiguresXY a)//конструктор копирования
+        private int _depth;//глубина текущего узла
+        public int Depth
         {
-            int Length = a._figures.Length;
-            this._figures = new XY[Length];
+            get { return _depth; }
+            //set { _figures = value; }
+        }
+
+        private Move[] _movesAvailable = null;//все доступные ходы
+        public Move[] MmovesAvailable
+        {
+            get { return _movesAvailable; }
+            //set { _figures = value; }
+        }
+        #endregion
+
+        /// <summary>
+        /// базовый конструктор, создающий корень дерева
+        /// </summary>
+        public Three(Board board)
+        {
+            //this._parent = null;
+            //this._children = new Three[0];
+            _boardMoved = board;
+            //this._move = null;
+            //this._valueMax = -1000;
+            //this._valueMin = 1000;
+            int _depth = 0;
+            Move[] _movesAvailable = Board.FindNextColorMoves(board);
+
+        }
+
+        /// <summary>
+        /// конструктор наследования/углубления
+        /// реализует один из возможных ходов родительской доски
+        /// </summary>
+        public Three(Three a, int moveNumber)
+        {
+            this._parent = a;//породивший узел называется родителем
+            a.AddChild(this);//вновь созданный узел называется потомком
+
+            Move[] MovesAvailable = a._movesAvailable;
+            if ((MovesAvailable != null) && (MovesAvailable.Length > moveNumber))
+            {
+                this._boardMoved = Board.DoMove(a._boardMoved, MovesAvailable[moveNumber])  ;
+            }
+
+            this._move = MovesAvailable[moveNumber];
+
+            //this._valueMax = -1000;
+            //this._valueMin = 1000;
+
+            int _depth = a._depth + 1;
+
+            if (_depth < _maxDepth)//если мы еще не достигли нужной глубины нужно найти все возможные ходы этой доски
+            { this._movesAvailable = Board.FindNextColorMoves(a._boardMoved); }
+        }
+
+        /// <summary>
+        /// добавляет в поле _children нового потомка
+        /// </summary>
+        public void AddChild(Three a)//Добавление наследника узлу дерева
+        {
+            int Length = this._children.Length;
+            Three[] Children = new Three[Length + 1];
+
             for (int i = 0; i < Length; i++)
             {
-                this._figures[i] = new XY(a._figures[i]);
+                Children[i] = this._children[i];
             }
-            this._king = a._king;
+            Children[Length] = a;
+            this._children = Children;
         }
 
-        public void DeleteXY(XY deleteXY)//удаление фигуры из массива
-        {
-            int count = this.Figures.Length;
-            XY[] FiguresCuted = new XY[count - 1];
-
-            int j = 0;
-            for (int i = 0; i < count; i++)
-            {
-                if ((this.Figures[i].r == deleteXY.r) && (this.Figures[i].c == deleteXY.c))
-                { continue; }
-
-                FiguresCuted[j] = new XY(this.Figures[i]);
-                j++;
-            }
-            this.Figures = FiguresCuted;
-        }
-
-        public void RewriteXY(XY oldXY, XY newXY)//изменение координат фигуры
-        {
-            int count = this.Figures.Length;
-
-            for (int i = 0; i < count; i++)
-            {
-                if ((this.Figures[i].r == oldXY.r) && (this.Figures[i].c == oldXY.c))
-                {
-                    this.Figures[i].r = newXY.r;
-                    this.Figures[i].c = newXY.c;
-                    break;
-                }
-            }
-        }
-
-        public FiguresXY(Color color)//конструктор для начальной позиции шахмат
-        {
-            int p = 0;//итератор для выходного массива фигур
-            XY[] OutFigures = new XY[16];
-            XY TempXY = null;
-
-            if (color == Color.White)
-            {
-                for (int j = 7; j > 5; j--)
-                {
-                    for (int i = 0; i < 8; i++)
-                    {
-                        TempXY = new XY(j, i);
-                        OutFigures[p] = TempXY;
-                        p++;
-                    }
-                }
-                TempXY = new XY(7, 4);
-                _king = TempXY;
-            }
-            else
-            {
-                for (int j = 0; j < 2; j++)
-                {
-                    for (int i = 0; i < 8; i++)
-                    {
-                        TempXY = new XY(j, i);
-                        OutFigures[p] = TempXY;
-                        p++;
-                    }
-                }
-                TempXY = new XY(0, 4);
-                _king = TempXY;
-            }
-            _figures = OutFigures;
-        }
     }
 
-    class AI
-    {
-
-
-    }
+    
 }
