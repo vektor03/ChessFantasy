@@ -14,7 +14,8 @@ namespace ChessFantasy
     {
         static Board _MainBoard = new Board();//главная доска на которой будет проходить игра
         bool _activatedFigure = false;//игрок тронул фигуру?
-        
+        bool _AIProcessing = false;//ИИ обсчитывает свой ход?
+
         Move[] _AvailableMoves = new Move[0];
         XY _MovingFigureXY;
 
@@ -37,6 +38,8 @@ namespace ChessFantasy
 
         private void Picture_Click(object sender, EventArgs e)
         {
+            if (_AIProcessing == true){ return; }//ИИ обсчитывает свой ход
+
             Point point = this.PointToClient(new Point(Cursor.Position.X, Cursor.Position.Y));
             int CursorX = point.X;
             int CursorY = point.Y;
@@ -76,7 +79,8 @@ namespace ChessFantasy
                 }
                 else//Если ходит черный игрок
                 {
-                    if ((Chosen == Cell.BlackPawn) | (Chosen == Cell.BlackKnight) |//если мы выбрали свою фигуру
+                    #region Черный игрок
+                    /*if ((Chosen == Cell.BlackPawn) | (Chosen == Cell.BlackKnight) |//если мы выбрали свою фигуру
                          (Chosen == Cell.BlackBishop) | (Chosen == Cell.BlackRook) |
                          (Chosen == Cell.BlackQueen) | (Chosen == Cell.BlackKing))
                     {
@@ -91,7 +95,8 @@ namespace ChessFantasy
                         _MovingFigureXY = FigureXY;//игрок собирается переместить эту фигуру
                         _AvailableMoves = Moves;
                         VisualBoard.DrawVisualBoardAvailable(this, _MainBoard, _AvailableMoves, FigureXY);//нарисуем доступные ходы
-                    }
+                    }*/
+                    #endregion
                 }
 
             }
@@ -111,7 +116,7 @@ namespace ChessFantasy
 
                 if (move != null)//пользователь нажал на доступный ход
                 {
-                    _MainBoard = Board.DoMove(_MainBoard, move, _MainBoard.NextColor);//делаем ход
+                    _MainBoard = Board.DoMove(_MainBoard, move);//делаем ход
 
                     bool CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
                     if (CheckCheck)
@@ -128,6 +133,25 @@ namespace ChessFantasy
 
                 _activatedFigure = false;//сбрасываем тронутую фигуру
                 _AvailableMoves = new Move[0];
+
+
+                #region Черный ИИ
+                _AIProcessing = true;
+                Move BestMove = AI.Processing(_MainBoard);
+
+                _MainBoard = Board.DoMove(_MainBoard, BestMove);//делаем ход
+
+                bool CheckCheck1 = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
+                if (CheckCheck1)
+                {
+                    bool CheckMate1 = Board.CheckMate(_MainBoard);//проверим ход на мат
+                    if (CheckMate1)
+                    {
+                        VisualBoard.CheckMate(_MainBoard.NextColor);
+                    }
+                }
+                _AIProcessing = false;
+                #endregion
             }
 
         }
