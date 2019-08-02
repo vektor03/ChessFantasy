@@ -34,6 +34,12 @@ namespace ChessFantasy
             if ((Root.Children == null) && (Three.MoveFound == true))//найден ход
             { return Root.Move; }
 
+            for (int i = 0; i < Length; i++)//потомки 1-го поколения, ходы ИИ
+            {
+                if (Root.ValueMax == Root.Children[i].ValueMin)//видимо мат в один ход найден
+                { return Root.Children[i].Move; }
+            }
+
             return null;//хз пока
         }
 
@@ -194,7 +200,7 @@ namespace ChessFantasy
             }
             else //доступные ходы есть теперь нужно узнать, достаточно ли мы глубоко чтобы начать оценивать состояние досок
             {
-                if (_depth < _maxDepth - 1)//если мы еще не достигли нужной глубины нужно найти все возможные ходы этой доски
+                if (this._depth < _maxDepth - 1)//если мы еще не достигли нужной глубины нужно найти все возможные ходы этой доски
                 {
                     this.Children = new Three[Length];
                     for (int i = 0; i < Length; i++)
@@ -202,6 +208,8 @@ namespace ChessFantasy
                         this.Children[i] = new Three(this, i);//он может обнулить массив children  в родительском объекте
                         if (this.Children == null) { break; }
                     }
+
+                    this.Children = null;
                 }
                 else//мы достигли нужной глубины
                 //узел который сейчас создается имеет глубину на единицу меньше максимальной глубины
@@ -214,7 +222,7 @@ namespace ChessFantasy
                         TempBoard = Board.DoMove(this._boardMoved, this._movesAvailable[i]);
                         value = AI.Evaluate(this._boardMoved);//оценка состояния доски
 
-                        if ((_depth + 1) % 2 == 0)//в цикле считаются ходы противника
+                        if ((this._depth + 1) % 2 == 0)//в цикле считаются ходы противника
                         {
                             if (this._valueMin > value) { this._valueMin = value; }//найти минимальный ход который противник может совершить после моего хода
                         }
@@ -224,32 +232,33 @@ namespace ChessFantasy
                         }
                     }
 
-                    if ((_depth + 1) % 2 == 0)//теперь нужно передать значение выше
-                    {
-                        if (a._valueMin > this._valueMin)//найти минимальный ход который противник может совершить после моего хода
-                        {
-                            a._valueMax = this._valueMin;
-                            a._parent._valueMin = this._valueMin;
-                        }
-                    }
-                    else 
-                    {
-                        if (a._valueMax < this._valueMin)//найти максимальный ход который я могу совершить после хода противника
-                        {
-                            a._valueMin = this._valueMax;
-                            a._parent._valueMax = this._valueMax;
-                        }
-                    }
-
                     //TODO проверять на альфабета отсечение внутри цикла
                 }
             }
 
+            if ((this._depth) % 2 == 1)//теперь нужно передать значение выше
+            {
+                if (a._valueMax < this._valueMin)//найти минимальный ход который противник может совершить после моего хода
+                {
+                    a._valueMax = this._valueMin;
+                    if (this._depth > 1) 
+                    {
+                        a._parent.UpdateValue(this._valueMin);
+                    }
+                }
+            }
+            else
+            {
+                if (a._valueMin > this._valueMax)//найти максимальный ход который я могу совершить после хода противника
+                {
+                    a._valueMin = this._valueMax;
+                    if (this._depth > 1)
+                    {
+                        a._parent.UpdateValue(this._valueMax);
+                    }
+                }
+            }
 
-            
-
-            //после того как цикл сработал, неважно оборвался или доработал
-            //нужно оценить положение данного узла относительно родителей, обновить валуе и убрать его из потомков
         }
 
         /// <summary>
@@ -266,6 +275,41 @@ namespace ChessFantasy
             }
             Children[Length] = a;
             this._children = Children;
+        }
+
+        /// <summary>
+        /// Обновляет значение value в зависимости от глубины
+        /// </summary>
+        public void UpdateValue(int value)
+        {
+            if ((this._depth) % 2 == 1)
+            {
+                this._valueMin = value;
+            }
+            else
+            {
+                this._valueMax = value;
+            }
+
+            if (this._children != null)//если есть потомки у которых нужно смотреть
+            {
+                if ((this._depth) % 2 == 1)
+                {
+                    for (int i = 0; i < this._children.Length; i++)
+                    {
+                        if ( (this._children[i] != null) && (this._valueMin > this._children[i]._valueMax) )
+                        { this._valueMin = this._children[i]._valueMax; }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < this._children.Length; i++)
+                    {
+                        if ((this._children[i] != null) && (this._valueMax < this._children[i]._valueMin))
+                        { this._valueMax = this._children[i]._valueMin; }
+                    }
+                }
+            }
         }
 
     }

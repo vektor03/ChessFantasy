@@ -114,26 +114,27 @@ namespace ChessFantasy
                     }
                 }
 
-                if (move != null)//пользователь нажал на доступный ход
-                {
-                    _MainBoard = Board.DoMove(_MainBoard, move);//делаем ход
-
-                    bool CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
-                    if (CheckCheck)
-                    {
-                        bool CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
-                        if (CheckMate)
-                        {
-                            VisualBoard.CheckMate(_MainBoard.NextColor);
-                        }
-                    }
-                }
-
-                VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
-
                 _activatedFigure = false;//сбрасываем тронутую фигуру
                 _AvailableMoves = new Move[0];
 
+                if (move == null)//пользователь нажал на недоступный ход
+                {
+                    VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
+                    return;
+                }
+
+                //пользователь нажал на доступный ход
+                _MainBoard = Board.DoMove(_MainBoard, move);//делаем ход
+                
+                bool CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
+                if (CheckCheck)
+                {
+                    bool CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
+                    if (CheckMate)
+                    {
+                        VisualBoard.CheckMate(_MainBoard.NextColor);
+                    }
+                }
 
                 #region Черный ИИ
                 _AIProcessing = true;
@@ -150,6 +151,7 @@ namespace ChessFantasy
                         VisualBoard.CheckMate(_MainBoard.NextColor);
                     }
                 }
+                VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
                 _AIProcessing = false;
                 #endregion
             }
