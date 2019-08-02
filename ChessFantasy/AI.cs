@@ -159,7 +159,7 @@ namespace ChessFantasy
             //this._valueMax = -1000;
             //this._valueMin = 1000;
 
-            int _depth = a._depth + 1;
+            this._depth = a._depth + 1;
 
             this._movesAvailable = Board.FindNextColorMoves(this._boardMoved);//найти все возможные ходы из этой доски
 
@@ -206,25 +206,41 @@ namespace ChessFantasy
                 else//мы достигли нужной глубины
                 //узел который сейчас создается имеет глубину на единицу меньше максимальной глубины
                 {
-                    a._children = null;//это уже не нужно, потому что дальше создавать узлы дерева мы не будем
                     //мы лишь оценим состояние всех возможных ходов и скажем на что можно рассчитывать родительскому узлу
-
+                    Board TempBoard;
                     int value;//для того чтоб хранить мгновенное состояние доски в цикле:
                     for (int i = 0; i < Length; i++)//нужно оценить состояние всех ходов
                     {
-                        this._boardMoved = Board.DoMove(a._boardMoved, this._movesAvailable[i]);
+                        TempBoard = Board.DoMove(this._boardMoved, this._movesAvailable[i]);
                         value = AI.Evaluate(this._boardMoved);//оценка состояния доски
 
                         if ((_depth + 1) % 2 == 0)//в цикле считаются ходы противника
                         {
-                            if (this._valueMin > value) { this._valueMax = value; }//найти минимальный ход который противник может совершить после моего хода
+                            if (this._valueMin > value) { this._valueMin = value; }//найти минимальный ход который противник может совершить после моего хода
                         }
                         else //в цикле считаются наши ходы
                         {
                             if (this._valueMax < value) { this._valueMax = value; }//найти максимальный ход который я могу совершить после хода противника
                         }
                     }
-                    
+
+                    if ((_depth + 1) % 2 == 0)//теперь нужно передать значение выше
+                    {
+                        if (a._valueMin > this._valueMin)//найти минимальный ход который противник может совершить после моего хода
+                        {
+                            a._valueMax = this._valueMin;
+                            a._parent._valueMin = this._valueMin;
+                        }
+                    }
+                    else 
+                    {
+                        if (a._valueMax < this._valueMin)//найти максимальный ход который я могу совершить после хода противника
+                        {
+                            a._valueMin = this._valueMax;
+                            a._parent._valueMax = this._valueMax;
+                        }
+                    }
+
                     //TODO проверять на альфабета отсечение внутри цикла
                 }
             }
