@@ -8,8 +8,6 @@ namespace ChessFantasy
 {
     public static class AI
     {
-        static Random _rnd = new Random(0);//чтоб одинаковые числа получать и тестить вначале
-
         /// <summary>
         /// основной метод рассчета ИИ
         /// </summary>
@@ -48,7 +46,64 @@ namespace ChessFantasy
         /// </summary>
         static public int Evaluate(Board board)
         {
-            int value = _rnd.Next(-100,100);
+            int value = 0;
+
+            for (int i = 0; i < board.BlackFigures.Figures.Length; i++)
+            {
+                int rFig = board.BlackFigures.Figures[i].r;
+                int cFig = board.BlackFigures.Figures[i].c;
+                switch (board.BoardArr[rFig, cFig])//клетка с которой начинается ход
+                {
+                    case (Cell.BlackPawn):
+                        value += 10;
+                        break;
+                    case (Cell.BlackKnight):
+                        value += 30;
+                        break;
+                    case (Cell.BlackBishop):
+                        value += 35;
+                        break;
+                    case (Cell.BlackRook):
+                        value += 50;
+                        break;
+                    case (Cell.BlackQueen):
+                        value += 95;
+                        break;
+                    case (Cell.BlackKing):
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            for (int i = 0; i < board.WhiteFigures.Figures.Length; i++)
+            {
+                int rFig = board.WhiteFigures.Figures[i].r;
+                int cFig = board.WhiteFigures.Figures[i].c;
+                switch (board.BoardArr[rFig, cFig])//клетка с которой начинается ход
+                {
+                    case (Cell.WhitePawn):
+                        value -= 10;
+                        break;
+                    case (Cell.WhiteKnight):
+                        value -= 30;
+                        break;
+                    case (Cell.WhiteBishop):
+                        value -= 35;
+                        break;
+                    case (Cell.WhiteRook):
+                        value -= 50;
+                        break;
+                    case (Cell.WhiteQueen):
+                        value -= 95;
+                        break;
+                    case (Cell.WhiteKing):
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             return value;
         }
 
@@ -212,7 +267,7 @@ namespace ChessFantasy
                     this.Children = null;
                 }
                 else//мы достигли нужной глубины
-                //узел который сейчас создается имеет глубину на единицу меньше максимальной глубины
+                //узел в котором мы находимся имеет глубину на единицу меньше максимальной глубины
                 {
                     //мы лишь оценим состояние всех возможных ходов и скажем на что можно рассчитывать родительскому узлу
                     Board TempBoard;
@@ -224,19 +279,39 @@ namespace ChessFantasy
 
                         if ((this._depth + 1) % 2 == 0)//в цикле считаются ходы противника
                         {
-                            if (this._valueMin > value) { this._valueMin = value; }//найти минимальный ход который противник может совершить после моего хода
+                            if (this._valueMin > value)//найти минимальный ход который противник может совершить после моего хода
+                            {
+                                this._valueMin = value;
+                                if (this._parent._valueMax > value)
+                                { break; }//альфабета отсечение
+                            }
                         }
                         else //в цикле считаются наши ходы
                         {
-                            if (this._valueMax < value) { this._valueMax = value; }//найти максимальный ход который я могу совершить после хода противника
+                            if (this._valueMax < value)//найти максимальный ход который я могу совершить после хода противника
+                            {
+                                this._valueMax = value;
+                                if (this._parent._valueMin < value)
+                                { break; }//альфабета отсечение
+                            }
                         }
                     }
 
-                    //TODO проверять на альфабета отсечение внутри цикла
+                    if ((this._depth + 1) % 2 == 0)//альфабета отсечение больших веток
+                    {
+                        if (a._parent._valueMin < this._valueMin)
+                        { this._parent._children = null; }//альфабета отсечение
+                    }
+                    else
+                    {
+                        if (a._parent._valueMax > this._valueMax)
+                        { this._parent._children = null; }//альфабета отсечение
+                    }
+
                 }
             }
 
-            if ((this._depth) % 2 == 1)//теперь нужно передать значение выше
+            if ((this._depth + 1) % 2 == 0)//теперь нужно передать значение выше
             {
                 if (a._valueMax < this._valueMin)//найти минимальный ход который противник может совершить после моего хода
                 {

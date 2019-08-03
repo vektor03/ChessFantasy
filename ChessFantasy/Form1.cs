@@ -125,35 +125,39 @@ namespace ChessFantasy
 
                 //пользователь нажал на доступный ход
                 _MainBoard = Board.DoMove(_MainBoard, move);//делаем ход
-                
+                bool CheckMate = false;
                 bool CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
                 if (CheckCheck)
                 {
-                    bool CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
+                    CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
                     if (CheckMate)
                     {
                         VisualBoard.CheckMate(_MainBoard.NextColor);
+                        VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
                     }
                 }
 
-                #region Черный ИИ
-                _AIProcessing = true;
-                Move BestMove = AI.Processing(_MainBoard);
-
-                _MainBoard = Board.DoMove(_MainBoard, BestMove);//делаем ход
-
-                bool CheckCheck1 = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
-                if (CheckCheck1)
+                if (!CheckMate)//если мы не поставили мат, то нужно искать ход противника
                 {
-                    bool CheckMate1 = Board.CheckMate(_MainBoard);//проверим ход на мат
-                    if (CheckMate1)
+                    #region Черный ИИ
+                    _AIProcessing = true;
+                    Move BestMove = AI.Processing(_MainBoard);
+
+                    _MainBoard = Board.DoMove(_MainBoard, BestMove);//делаем ход
+
+                    CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
+                    if (CheckCheck)
                     {
-                        VisualBoard.CheckMate(_MainBoard.NextColor);
+                        CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
+                        if (CheckMate)
+                        {
+                            VisualBoard.CheckMate(_MainBoard.NextColor);
+                        }
                     }
+                    VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
+                    _AIProcessing = false;
+                    #endregion
                 }
-                VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
-                _AIProcessing = false;
-                #endregion
             }
 
         }
