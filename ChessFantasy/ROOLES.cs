@@ -44,9 +44,16 @@ namespace ChessFantasy
         #region свойства
         //Флаги о том что белый и черный игроки двигали королей и ладьи (для рокировки)
         private bool _WLRogueAvailable = true;//У белых есть право на длинную рокировку (левая ладья и король не делали ход)
+        public bool WLRogueAvailable  {  get { return _WLRogueAvailable; }    }
+
         private bool _WRRogueAvailable = true;//У белых есть право на короткую рокировку (правая ладья и король не делали ход)
+        public bool WRRogueAvailable { get { return _WRRogueAvailable; } }
+
         private bool _BLRogueAvailable = true;//У черных есть право на длинную рокировку (левая ладья и король не делали ход)
+        public bool BLRogueAvailable { get { return _BLRogueAvailable; } }
+
         private bool _BRRogueAvailable = true;//У черных есть право на короткую рокировку (правая ладья и король не делали ход)
+        public bool BRRogueAvailable { get { return _BRRogueAvailable; } }
 
         private Cell[,] _board; //Сама доска, массив 8х8 в котором записано состояние каждой клетки
         public Cell[,] BoardArr//Свойства чтобы можно было снаружи смотреть массив
@@ -275,6 +282,17 @@ namespace ChessFantasy
             else { return null; }
         }
 
+        /// <summary>
+        /// Инвертирует цвет игрока который должен ходить
+        /// </summary>
+        public Board InvertColor()
+        {
+            if (this._nextColor == Color.White)
+            { this._nextColor = Color.Black; }
+            else
+            { this._nextColor = Color.White; }
+            return this;
+        }
 
         #region FindFiguresMoves
         /// <summary>

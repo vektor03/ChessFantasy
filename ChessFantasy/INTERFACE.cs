@@ -12,7 +12,8 @@ namespace ChessFantasy
         WhiteCell = 0,
         BlackCell = 1,
         WhiteCellAvailable = 2,
-        BlackCellAvailable = 3
+        BlackCellAvailable = 3,
+        CellEnemy = 4
     }
 
     static public class VisualBoard
@@ -33,6 +34,7 @@ namespace ChessFantasy
         static private Image WhiteKing = Image.FromFile("Resources\\WhiteKing.png");
         static private Image BlackCellAvailable = Image.FromFile("Resources\\BlackCellAvailable.png");
         static private Image WhiteCellAvailable = Image.FromFile("Resources\\WhiteCellAvailable.png");
+        static private Image CellEnemy = Image.FromFile("Resources\\CellEnemy.png");
 
         static Bitmap Bmp = new Bitmap(800, 800);
         static Graphics Graph = Graphics.FromImage(Bmp);
@@ -73,27 +75,30 @@ namespace ChessFantasy
         /// </summary>
         static public void DrawVisualBoardAvailable(Form1 form, Board board, Move[] AvailableMoves, XY MovingFigure)
         {
-            int CountFound = AvailableMoves.Length;// количество доступных ходов
-            if (CountFound == 0) { return; }
-
             int r = 0;
             int c = 0;
 
-            for (int i = 0; i < CountFound; i++)//по всем доступным ходам
+            if (AvailableMoves != null)
             {
-                r = AvailableMoves[i].XY2.r;
-                c = AvailableMoves[i].XY2.c;
+                int CountFound = AvailableMoves.Length;// количество доступных ходов
+                if (CountFound == 0) { return; }
 
-                if ((r + c) % 2 == 0)//черная клетка
+                for (int i = 0; i < CountFound; i++)//по всем доступным ходам
                 {
-                    DrawCell(VisualCell.BlackCellAvailable, r, c);//нарисовать клетку
-                }
-                else
-                {
-                    DrawCell(VisualCell.WhiteCellAvailable, r, c);//нарисовать клетку
-                }
+                    r = AvailableMoves[i].XY2.r;
+                    c = AvailableMoves[i].XY2.c;
 
-                DrawFigure(board, r, c);//нарисовать фигуру которая была сверху
+                    if ((r + c) % 2 == 0)//черная клетка
+                    {
+                        DrawCell(VisualCell.BlackCellAvailable, r, c);//нарисовать клетку
+                    }
+                    else
+                    {
+                        DrawCell(VisualCell.WhiteCellAvailable, r, c);//нарисовать клетку
+                    }
+
+                    DrawFigure(board, r, c);//нарисовать фигуру которая была сверху
+                }
             }
 
             //теперь нужно выделить фигуру которая будет ходить
@@ -107,6 +112,25 @@ namespace ChessFantasy
             {
                 DrawCell(VisualCell.WhiteCellAvailable, r, c);//нарисовать клетку
             }
+
+            DrawFigure(board, r, c);//нарисовать фигуру которая была сверху
+
+            form.Draw(Bmp);
+        }
+
+        /// <summary>
+        /// нарисовать все доступные фигуре ходы
+        /// </summary>
+        static public void DrawVisualBoardEnemyMoved(Form1 form, Board board, XY MovingFigure)
+        {
+            int r = 0;
+            int c = 0;
+
+            //теперь нужно выделить фигуру которая будет ходить
+            r = MovingFigure.r;
+            c = MovingFigure.c;
+
+            DrawCell(VisualCell.CellEnemy, r, c);//нарисовать клетку
 
             DrawFigure(board, r, c);//нарисовать фигуру которая была сверху
 
@@ -201,6 +225,9 @@ namespace ChessFantasy
                     break;
                 case (VisualCell.WhiteCellAvailable):
                     CellImage = WhiteCellAvailable;
+                    break;
+                case (VisualCell.CellEnemy):
+                    CellImage = CellEnemy;
                     break;
                 default:
                     return;

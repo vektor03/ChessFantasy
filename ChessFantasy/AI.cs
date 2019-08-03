@@ -48,6 +48,7 @@ namespace ChessFantasy
         {
             int value = 0;
 
+            //Сначала пересчитаем фигуры
             for (int i = 0; i < board.BlackFigures.Figures.Length; i++)
             {
                 int rFig = board.BlackFigures.Figures[i].r;
@@ -75,7 +76,6 @@ namespace ChessFantasy
                         break;
                 }
             }
-
             for (int i = 0; i < board.WhiteFigures.Figures.Length; i++)
             {
                 int rFig = board.WhiteFigures.Figures[i].r;
@@ -103,6 +103,32 @@ namespace ChessFantasy
                         break;
                 }
             }
+
+            //Потом пересчитаем возможные ходы, типа развитие фигур
+            Move[] Temp;
+            if (board.NextColor == Color.White)
+            {
+                Temp = Board.FindNextColorMoves(board);
+                value -= Temp.Length / 2;
+
+                Temp = Board.FindNextColorMoves(board.InvertColor());
+                value += Temp.Length / 2;
+            }
+            else
+            {
+                Temp = Board.FindNextColorMoves(board);
+                value += Temp.Length / 5;
+
+                Temp = Board.FindNextColorMoves(board.InvertColor());
+                value -= Temp.Length / 5;
+            }
+            board.InvertColor();
+
+            //Добавим право на рокировку
+            if (board.BLRogueAvailable) { value += 3; }
+            if (board.BRRogueAvailable) { value += 3; }
+            if (board.WLRogueAvailable) { value -= 3; }
+            if (board.WRRogueAvailable) { value -= 3; }
 
             return value;
         }

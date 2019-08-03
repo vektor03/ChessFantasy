@@ -133,7 +133,6 @@ namespace ChessFantasy
                     if (CheckMate)
                     {
                         VisualBoard.CheckMate(_MainBoard.NextColor);
-                        VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
                     }
                 }
 
@@ -155,6 +154,7 @@ namespace ChessFantasy
                         }
                     }
                     VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
+                    VisualBoard.DrawVisualBoardEnemyMoved(this, _MainBoard, BestMove.XY2);//нарисуем доступные ходы
                     _AIProcessing = false;
                     #endregion
                 }
