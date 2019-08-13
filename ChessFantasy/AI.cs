@@ -117,10 +117,10 @@ namespace ChessFantasy
             else
             {
                 Temp = Board.FindNextColorMoves(board);
-                value += Temp.Length / 5;
+                value += Temp.Length / 4;
 
                 Temp = Board.FindNextColorMoves(board.InvertColor());
-                value -= Temp.Length / 5;
+                value -= Temp.Length / 4;
             }
             board.InvertColor();
 
@@ -181,14 +181,14 @@ namespace ChessFantasy
             //set { _figures = value; }
         }
 
-        private int _valueMax = -1000;//максимальное значение состояния доски на которое рассчитывает наш оппонент, выше мы его не поднимем
+        private int _valueMax = -1000000;//максимальное значение состояния доски на которое рассчитывает наш оппонент, выше мы его не поднимем
         public int ValueMax
         {
             get { return _valueMax; }
             //set { _figures = value; }
         }
 
-        private int _valueMin = 1000;//минимальное значение состояния доски на которое мы можем рассчитывать. Ниже противник его не опустит
+        private int _valueMin = 1000000;//минимальное значение состояния доски на которое мы можем рассчитывать. Ниже противник его не опустит
         public int ValueMin
         {
             get { return _valueMin; }
@@ -215,6 +215,7 @@ namespace ChessFantasy
         /// </summary>
         public Three(Board board)
         {
+            Three._countThree = 1;
             //this._parent = null;
             //this._children = new Three[0];
             this._boardMoved = board;
@@ -254,7 +255,7 @@ namespace ChessFantasy
 
             if (Length == 0)//если ходов не найдено, значит мат, но кому?
             {
-                if (_depth % 2 == 0)//нам мат
+                if (_depth % 2 == 0)//нам мат или пат, энивей, проморгали проигрыш/ничью
                 {
                     //нужно предыдущий ход противника пометить как неизбежно ведущий к мату и удалить всех его потомков
                     //потому что если у противника есть возможность поставить нам мат, он ей воспользуется
@@ -263,21 +264,29 @@ namespace ChessFantasy
                 }
                 else //мы поставили мат
                 {
-                    if (_depth == 1)//есть доступный мат в один ход, ничего считать больше не нужно
-                    {
-                        a._move = this._move;
-                        Three._moveFound = true;
-                        a._children = null;
-                    }
-                    else//у нас есть доступный мат после вражеского хода. нужно просто пометить ход как потенциально выигрышный
-                    {
-                        a._valueMax = 1000000;//типа бесконечность, потом поменяю если что
-                        //противник знает что этот ход приведет к нашей победе
-                        a._children = null;
-                    }
+                    bool CheckCheck = Board.CheckCheck(this._boardMoved, this._boardMoved.NextColor);//проверим ход на шах
 
+                    if (CheckCheck)//если это правда мат
+                    {
+                        if (_depth == 1)//есть доступный мат в один ход, ничего считать больше не нужно
+                        {
+                            a._move = this._move;
+                            Three._moveFound = true;
+                            a._children = null;
+                            return;//ничего считать больше не нужно
+                        }
+                        else//у нас есть доступный мат после вражеского хода. нужно просто пометить ход как потенциально выигрышный
+                        {
+                            a._valueMax = 1000000;//типа бесконечность, потом поменяю если что
+                                                  //противник знает что этот ход приведет к нашей победе
+                            a._children = null;
+                        }
+                    }
+                    else//если это просто пат
+                    {
+                        this._valueMin = -10000;//стоимость пата, но мы его не хотим, мы хотим раздавить противника. Кожанные мешки...биип..
+                    }
                 }
-                return;
             }
             else //доступные ходы есть теперь нужно узнать, достаточно ли мы глубоко чтобы начать оценивать состояние досок
             {

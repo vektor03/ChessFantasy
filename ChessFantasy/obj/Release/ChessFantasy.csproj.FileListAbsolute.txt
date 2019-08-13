@@ -1,0 +1,9 @@
+D:\VICTOR\ChessFantasy\ChessFantasy\bin\Release\ChessFantasy.exe.config
+D:\VICTOR\ChessFantasy\ChessFantasy\bin\Release\ChessFantasy.exe
+D:\VICTOR\ChessFantasy\ChessFantasy\bin\Release\ChessFantasy.pdb
+D:\VICTOR\ChessFantasy\ChessFantasy\obj\Release\ChessFantasy.csprojAssemblyReference.cache
+D:\VICTOR\ChessFantasy\ChessFantasy\obj\Release\ChessFantasy.Properties.Resources.resources
+D:\VICTOR\ChessFantasy\ChessFantasy\obj\Release\ChessFantasy.csproj.GenerateResource.cache
+D:\VICTOR\ChessFantasy\ChessFantasy\obj\Release\ChessFantasy.csproj.CoreCompileInputs.cache
+D:\VICTOR\ChessFantasy\ChessFantasy\obj\Release\ChessFantasy.exe
+D:\VICTOR\ChessFantasy\ChessFantasy\obj\Release\ChessFantasy.pdb
