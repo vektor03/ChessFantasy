@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace ChessFantasy
 {
     public partial class Form1 : Form
     {
         static Board _MainBoard = new Board();//главная доска на которой будет проходить игра
-        bool _activatedFigure = false;//игрок тронул фигуру?
-        bool _AIProcessing = false;//ИИ обсчитывает свой ход?
+        static bool _activatedFigure = false;//игрок тронул фигуру?
+        static bool _AIProcessing = false;//ИИ обсчитывает свой ход?
 
         Move[] _AvailableMoves = new Move[0];
         XY _MovingFigureXY;
@@ -138,32 +139,43 @@ namespace ChessFantasy
                     }
                 }
 
+                VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
+
                 if (!CheckMate)//если мы не поставили мат, то нужно искать ход противника
                 {
-                    #region Черный ИИ
-                    _AIProcessing = true;
-                    Move BestMove = AI.Processing(_MainBoard);
-
-                    _MainBoard = Board.DoMove(_MainBoard, BestMove);//делаем ход
-
-                    CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
-                    if (CheckCheck)
-                    {
-                        CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
-                        if (CheckMate)
-                        {
-                            VisualBoard.CheckMate(_MainBoard.NextColor);
-                            VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
-                            return;
-                        }
-                    }
-                    VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
-                    VisualBoard.DrawVisualBoardEnemyMoved(this, _MainBoard, BestMove.XY2);//нарисуем доступные ходы
-                    _AIProcessing = false;
-                    #endregion
+                    Thread myThread = new Thread(new ThreadStart(AIRun)); //Создаем новый объект потока (Thread)
+                    myThread.Start(); //запускаем поток
                 }
             }
 
         }
+
+        /// <summary>
+        /// специальная функция, которая нужна для рассчета ИИ в отдельном потоке
+        /// полностью заведует взаимодействием с ИИ и запускается в отдельном потоке
+        /// </summary>
+        public void AIRun()
+        {
+            _AIProcessing = true;
+            Move BestMove = AI.Processing(_MainBoard);
+            _MainBoard = Board.DoMove(_MainBoard, BestMove);//делаем ход
+
+            bool CheckCheck = Board.CheckCheck(_MainBoard, _MainBoard.NextColor);//проверим ход на шах
+            if (CheckCheck)
+            {
+                bool CheckMate = Board.CheckMate(_MainBoard);//проверим ход на мат
+                if (CheckMate)
+                {
+                    VisualBoard.CheckMate(_MainBoard.NextColor);
+                    VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
+                    return;
+                }
+            }
+            VisualBoard.DrawVisualBoard(this, _MainBoard);//перерисовываем доску
+            VisualBoard.DrawVisualBoardEnemyMoved(this, _MainBoard, BestMove.XY2);//нарисуем доступные ходы
+
+            _AIProcessing = false;
+        }
     }
+
 }
